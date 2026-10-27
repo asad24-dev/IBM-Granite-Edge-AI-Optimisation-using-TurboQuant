@@ -206,6 +206,87 @@ public sealed class WorkerResultMapperTests
             RuntimeTestData.RequestId,
             source);
 
+        AssertOperationalFailure(
+            result,
+            "MI-OP-WORKER-CLIENT-TERMINATION");
+        StringAssert.DoesNotContain(
+            result.Failure!.TechnicalDetail,
+            secret,
+            StringComparison.Ordinal);
+        StringAssert.DoesNotContain(
+            result.Failure.TechnicalDetail,
+            RuntimeTestData.RequestId.ToString(),
+            StringComparison.Ordinal);
+    }
+
+    [DataTestMethod]
+    [DataRow(
+        WorkerClientFailureCodes.WorkerPackageIntegrityFailed,
+        "MI-OP-WORKER-CLIENT-INTEGRITY")]
+    [DataRow(
+        WorkerClientFailureCodes.WorkerEnvironmentPolicyFailed,
+        "MI-OP-WORKER-CLIENT-LAUNCH")]
+    [DataRow(
+        WorkerClientFailureCodes.WorkerProtocolInvalid,
+        "MI-OP-WORKER-CLIENT-PROTOCOL")]
+    [DataRow(
+        WorkerClientFailureCodes.WorkerOverallTimeout,
+        "MI-OP-WORKER-CLIENT-TERMINATION")]
+    [DataRow(
+        WorkerClientFailureCodes.WorkerCleanupFailed,
+        "MI-OP-WORKER-CLIENT-CLEANUP")]
+    public void MapResult_ClientFailureMapsOnlySafeCategory(
+        string workerClientCode,
+        string expectedApplicationCode)
+    {
+        const string secret = @"C:\private\granite.gguf";
+        WorkerClientResult source = new(
+            TerminalMessage: null,
+            Failure: new WorkerClientFailure(
+                workerClientCode,
+                $"request {RuntimeTestData.RequestId} {secret}"),
+            ExitCode: 9,
+            ForcedTermination: true,
+            StandardErrorTruncated: false,
+            RetainedStandardError: $"stderr {secret}",
+            SecondaryDiagnostics: [$"diagnostic {secret}"]);
+
+        ModelInspectionProbeResult result = _mapper.MapResult(
+            RuntimeTestData.CreateRequest(),
+            RuntimeTestData.RequestId,
+            source);
+
+        AssertOperationalFailure(result, expectedApplicationCode);
+        StringAssert.DoesNotContain(
+            result.Failure!.TechnicalDetail,
+            secret,
+            StringComparison.Ordinal);
+        StringAssert.DoesNotContain(
+            result.Failure.TechnicalDetail,
+            RuntimeTestData.RequestId.ToString(),
+            StringComparison.Ordinal);
+    }
+
+    [TestMethod]
+    public void MapResult_UnapprovedClientFailureFailsClosedToGenericCategory()
+    {
+        const string secret = @"C:\private\granite.gguf";
+        WorkerClientResult source = new(
+            TerminalMessage: null,
+            Failure: new WorkerClientFailure(
+                "unapproved-worker-code",
+                $"request {RuntimeTestData.RequestId} {secret}"),
+            ExitCode: 9,
+            ForcedTermination: true,
+            StandardErrorTruncated: false,
+            RetainedStandardError: $"stderr {secret}",
+            SecondaryDiagnostics: [$"diagnostic {secret}"]);
+
+        ModelInspectionProbeResult result = _mapper.MapResult(
+            RuntimeTestData.CreateRequest(),
+            RuntimeTestData.RequestId,
+            source);
+
         AssertOperationalFailure(result, "MI-OP-WORKER-CLIENT");
         StringAssert.DoesNotContain(
             result.Failure!.TechnicalDetail,

@@ -89,7 +89,7 @@ internal sealed class WorkerResultMapper
                 return ClientFailure();
             }
 
-            return ClientFailure();
+            return ClientFailure(result.Failure.Code);
         }
 
         WorkerCompletedMessage? terminal = result.TerminalMessage;
@@ -327,14 +327,53 @@ internal sealed class WorkerResultMapper
         }
     }
 
-    private static ModelInspectionProbeResult ClientFailure()
+    private static ModelInspectionProbeResult ClientFailure(
+        string? workerClientFailureCode = null)
     {
         return ModelInspectionProbeResult.OperationalFailure(
             new ModelInspectionOperationalFailure(
-                "MI-OP-WORKER-CLIENT",
+                MapClientFailureCategory(workerClientFailureCode),
                 CompletionFailureUserMessage,
                 "The protected worker client did not return a trusted terminal result."));
     }
+
+    /// <summary>
+    /// Maps only the closed worker-client taxonomy to broad, application-owned
+    /// diagnostic categories. The worker message, stderr, paths, environment,
+    /// request identifiers and protocol content never cross this boundary.
+    /// </summary>
+    private static string MapClientFailureCategory(
+        string? workerClientFailureCode) => workerClientFailureCode switch
+    {
+        WorkerClientFailureCodes.WorkerExecutableUntrusted or
+        WorkerClientFailureCodes.WorkerPackageIntegrityFailed or
+        WorkerClientFailureCodes.WorkerArchitectureUnsupported or
+        WorkerClientFailureCodes.WorkerProcessTreeIntegrityFailed =>
+            "MI-OP-WORKER-CLIENT-INTEGRITY",
+
+        WorkerClientFailureCodes.WorkerLaunchFailed or
+        WorkerClientFailureCodes.WorkerContainmentFailed or
+        WorkerClientFailureCodes.WorkerHandlePolicyFailed or
+        WorkerClientFailureCodes.WorkerEnvironmentPolicyFailed =>
+            "MI-OP-WORKER-CLIENT-LAUNCH",
+
+        WorkerClientFailureCodes.WorkerHandshakeTimeout or
+        WorkerClientFailureCodes.WorkerHandshakeInvalid or
+        WorkerClientFailureCodes.WorkerProtocolInvalid or
+        WorkerClientFailureCodes.WorkerOutputLimitExceeded =>
+            "MI-OP-WORKER-CLIENT-PROTOCOL",
+
+        WorkerClientFailureCodes.WorkerCrashed or
+        WorkerClientFailureCodes.WorkerOverallTimeout or
+        WorkerClientFailureCodes.WorkerCancellationForced or
+        WorkerClientFailureCodes.WorkerExitMismatch =>
+            "MI-OP-WORKER-CLIENT-TERMINATION",
+
+        WorkerClientFailureCodes.WorkerCleanupFailed =>
+            "MI-OP-WORKER-CLIENT-CLEANUP",
+
+        _ => "MI-OP-WORKER-CLIENT"
+    };
 
     private static ModelInspectionProbeResult WorkerFailure()
     {
