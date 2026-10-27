@@ -1,0 +1,48 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "8GB-WINDOWS-LAPTOP-v1",
+  "test_id": "APP-8GB-HM-Q2-003",
+  "run_id": "APP-8GB-HM-Q2-003",
+  "route": "packaged-app-model-inspection-short-path-test",
+  "run_purpose": "Test whether the immediate inspection failure is tied to the original package-local model path or path length by selecting a hard link to the exact same verified Q2_K bytes from a short ordinary local path.",
+  "status": "completed-blocked",
+  "operator": "Muhammad Asad Majeed",
+  "references": {
+    "environment_id": "ENV-8GB-LENOVO-82QC-001",
+    "prior_run_ids": [
+      "APP-8GB-HM-Q2-001",
+      "APP-8GB-HM-Q2-002"
+    ],
+    "application_setup_package_version": "1.0.4.0",
+    "model_id": "granite-4.0-h-micro-q2-k"
+  },
+  "model": {
+    "filename": "HMicro-Q2K.gguf",
+    "source_filename": "granite-4.0-h-micro-Q2_K.gguf",
+    "weight_quantisation": "Q2_K",
+    "size_bytes": 1226247840,
+    "sha256": "e60b313fc0ce2a0a2c3903f4399ac61fe1048c38f219bcbd9f7a708e168b8ead",
+    "selection_route": "Use local model; hard link at C:\\Users\\Asad\\AppData\\Local\\GraniteDiagnostics\\HMicro-Q2K.gguf",
+    "storage_note": "Hard link to the verified original GGUF; no download or duplicate model copy."
+  },
+  "test_controls": {
+    "same_model_bytes_as_prior_runs": true,
+    "shorter_ordinary_local_path": true,
+    "download_new_model": false,
+    "change_configuration": false,
+    "stop_after_inspection": true
+  },
+  "result": {
+    "outcome": "inspection-failed",
+    "inspection_stage_visible_at_failure": "Check model package (0% complete)",
+    "inspection_status": "RESULT UNKNOWN",
+    "diagnostic_code": "INSPECT-OP-001",
+    "message": "Inspection could not be completed.",
+    "model_data_changed": false,
+    "reached_hardware_fit": false,
+    "reached_configuration": false,
+    "reached_chat": false,
+    "evidence": "Operator screenshot captured in the session record."
+  },
+  "notes": "The short-path hard-link route reproduced the immediate generic inspection failure. This makes the original package-local path and its length unlikely explanations. It does not identify the protected inspection workflow failure cause."
+}

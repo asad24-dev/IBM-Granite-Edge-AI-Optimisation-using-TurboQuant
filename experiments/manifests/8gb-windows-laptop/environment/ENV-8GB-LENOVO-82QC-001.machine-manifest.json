@@ -1,0 +1,68 @@
+{
+  "schema_version": "1.0",
+  "environment_id": "ENV-8GB-LENOVO-82QC-001",
+  "captured_at_utc": "2026-10-20T11:38:12Z",
+  "captured_at_local": "2026-10-20T12:38:12+01:00",
+  "timezone": "Europe/London",
+  "machine": {
+    "name": "LAPTOP-I4HLTV3K",
+    "role": "target-windows-8gb-laptop",
+    "manufacturer": "LENOVO",
+    "model": "82QC",
+    "windows_caption": "Microsoft Windows 11 Home",
+    "windows_version": "10.0.22631",
+    "windows_build": "22631",
+    "architecture": "64-bit"
+  },
+  "cpu": [
+    {
+      "model": "12th Gen Intel(R) Core(TM) i3-1215U",
+      "physical_cores": 6,
+      "logical_processors": 8
+    }
+  ],
+  "gpu": [
+    {
+      "model": "Intel(R) UHD Graphics",
+      "driver": "32.0.101.6129",
+      "adapter_ram_bytes_reported": 2147479552,
+      "interpretation": "Reported adapter memory is not treated as dedicated or usable inference VRAM."
+    }
+  ],
+  "memory": {
+    "installed_ram_bytes": 8301043712,
+    "available_ram_before_model_load_mib": 1147,
+    "available_ram_before_model_load_bytes": null,
+    "measurement_method": "Get-Counter \\Memory\\Available MBytes; exact byte value was not captured."
+  },
+  "storage": {
+    "volume": "C:",
+    "free_bytes": 20706234368,
+    "free_gib_displayed": 19.28,
+    "size_bytes": null
+  },
+  "operating_conditions": {
+    "windows_last_boot_local": "2026-10-20T10:44:02+01:00",
+    "background_load_notes": "Baseline was captured after packaged-app launch; no model was loaded. A reboot and fresh capture are planned before the first inference run.",
+    "power_mode": null,
+    "power_source": null,
+    "thermal_state": "Not measured."
+  },
+  "toolchain": {
+    "git": "git version 2.46.2.windows.1",
+    "powershell": null,
+    "visual_studio": null
+  },
+  "repository": {
+    "path": "C:\\Users\\Asad\\src\\granite",
+    "commit": "489a6f0d393c8a7c5e800a367c4d889099f40bcd",
+    "working_tree_status": "clean when verified before this campaign record"
+  },
+  "application": {
+    "setup_package_version": "1.0.4.0",
+    "setup_zip_sha256": "6788E6E293EB1D7129733F4C7246AABA26F8BC5F068751C35806418C17391126",
+    "setup_check_result": "Bundle hashes and Microsoft dependency signatures passed. Nothing installed.",
+    "package_to_source_provenance": "Not independently established by this baseline record."
+  },
+  "notes": "This is a physical 8 GB device record, not a calibration result or proof of supported inference."
+}

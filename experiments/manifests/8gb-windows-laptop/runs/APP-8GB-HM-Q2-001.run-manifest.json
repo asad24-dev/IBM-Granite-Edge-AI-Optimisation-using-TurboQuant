@@ -1,0 +1,73 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "8GB-WINDOWS-LAPTOP-v1",
+  "test_id": "APP-8GB-HM-Q2-001",
+  "run_id": "APP-8GB-HM-Q2-001",
+  "route": "packaged-app-model-inspection",
+  "run_purpose": "First physical-device attempt to download and inspect the smallest pinned Granite 4.0 H Micro GGUF on the target 8 GB laptop.",
+  "operator": "Muhammad Asad Majeed",
+  "timestamps": {
+    "start_utc": null,
+    "end_utc": null,
+    "start_local": "2026-10-20",
+    "end_local": "2026-10-20",
+    "timezone": "Europe/London"
+  },
+  "references": {
+    "environment_id": "ENV-8GB-LENOVO-82QC-001",
+    "repository_commit": "489a6f0d393c8a7c5e800a367c4d889099f40bcd",
+    "application_setup_package_version": "1.0.4.0",
+    "model_id": "granite-4.0-h-micro-q2-k",
+    "configuration_id": null,
+    "prompt_id": null
+  },
+  "model": {
+    "source": "Pinned in-app IBM Granite 4.0 H Micro catalogue",
+    "filename": "granite-4.0-h-micro-Q2_K.gguf",
+    "weight_quantisation": "Q2_K",
+    "expected_size_bytes": 1226247840,
+    "expected_sha256": "e60b313fc0ce2a0a2c3903f4399ac61fe1048c38f219bcbd9f7a708e168b8ead",
+    "independent_local_hash_captured": true,
+    "independent_local_hash": "e60b313fc0ce2a0a2c3903f4399ac61fe1048c38f219bcbd9f7a708e168b8ead",
+    "local_path": "C:\\Users\\Asad\\AppData\\Local\\Packages\\488d3892-c214-40c5-9a6a-1154c1e69fff_gqahnnh6hk88w\\LocalState\\GraniteEdgeAI\\Models\\Models\\granite-4.0-h-micro-Q2_K.gguf"
+  },
+  "execution": {
+    "requested_backend": "Not reached",
+    "actual_backend": "Not reached",
+    "requested_device": "CPU-oriented route intended",
+    "actual_device": "Not reached",
+    "optimisation_requested": false,
+    "optimisation_activated": false
+  },
+  "correctness": {
+    "model_download_selected": true,
+    "download_ui_verification_message": "Verified package metadata. The production route verifies the pinned size and SHA-256 before making the model available.",
+    "model_inspection_success": false,
+    "model_load_success": false,
+    "generation_success": false,
+    "observed_ui_state": "Model inspection could not be completed; RESULT UNKNOWN."
+  },
+  "resources": {
+    "available_ram_after_reboot_mib": 2024,
+    "free_storage_after_reboot_gib": 19.43,
+    "free_storage_before_download_gib_user_reported": 24.6,
+    "peak_working_set_bytes": null,
+    "peak_private_bytes": null
+  },
+  "evidence": {
+    "screenshot_status": "Inspection-failure screen captured in the session record; a repository-relative image file was not retained.",
+    "diagnostic_code": "INSPECT-OP-001",
+    "displayed_detail": "No model data was changed.",
+    "stdout": null,
+    "stderr": null,
+    "installed_package": "488d3892-c214-40c5-9a6a-1154c1e69fff_1.0.4.0_x64__gqahnnh6hk88w",
+    "worker_integrity_check": "Passed: all 44 ModelInspection/Worker files matched the installed worker manifest lengths and SHA-256 hashes."
+  },
+  "classification": {
+    "result": "failed",
+    "result_reason": "The application reached model inspection but reported an operational failure before hardware fit, configuration, model load, or chat.",
+    "cause_status": "Unknown. The displayed code is not mapped to a specific cause in the checked-out source revision. The model file and installed worker manifest both passed independent integrity checks.",
+    "next_action": "Preserve the evidence; inspect application diagnostics and package/runtime identity before any controlled retry. Do not interpret this as an 8 GB memory-fit result."
+  },
+  "notes": "The app displayed Granite 4.0 H Micro, GGUF | Q2_K | 1.14 GB on the inspection screen. No model data was changed according to the UI."
+}

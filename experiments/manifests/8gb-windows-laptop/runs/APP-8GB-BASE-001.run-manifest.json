@@ -1,0 +1,70 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "8GB-WINDOWS-LAPTOP-v1",
+  "test_id": "APP-8GB-BASE-001",
+  "run_id": "APP-8GB-BASE-001",
+  "route": "packaged-app-launch",
+  "run_purpose": "Verify that the installed Granite packaged application visibly launches on the target 8 GB laptop before any model download or inference attempt.",
+  "operator": "Muhammad Asad Majeed",
+  "timestamps": {
+    "start_utc": "2026-10-20T11:38:12Z",
+    "end_utc": null,
+    "start_local": "2026-10-20T12:38:12+01:00",
+    "end_local": null,
+    "timezone": "Europe/London"
+  },
+  "references": {
+    "environment_id": "ENV-8GB-LENOVO-82QC-001",
+    "repository_commit": "489a6f0d393c8a7c5e800a367c4d889099f40bcd",
+    "application_setup_package_version": "1.0.4.0",
+    "model_id": null,
+    "configuration_id": null,
+    "prompt_id": null
+  },
+  "execution": {
+    "working_directory": "C:\\Users\\Asad",
+    "command_path": "powershell.exe -NoProfile -ExecutionPolicy RemoteSigned -File C:\\Downloads\\Granite-Edge-AI-Setup-1.0.4\\Setup-Granite.ps1 -Step Launch",
+    "exit_code": 0,
+    "requested_backend": null,
+    "actual_backend": null,
+    "requested_device": null,
+    "actual_device": null,
+    "optimisation_requested": false,
+    "optimisation_activated": false
+  },
+  "generation": {
+    "max_output_tokens": null,
+    "context_target_tokens": null,
+    "actual_input_tokens": null,
+    "actual_output_tokens": null
+  },
+  "correctness": {
+    "model_load_success": false,
+    "generation_success": false,
+    "observed_ui_state": "Granite visibly opened to the Choose a model screen.",
+    "model_loaded": false
+  },
+  "performance": {
+    "model_load_time_ms": null,
+    "ttft_ms": null,
+    "decode_tokens_per_second": null
+  },
+  "resources": {
+    "available_ram_before_mib": 1147,
+    "available_ram_before_bytes": null,
+    "free_storage_before_bytes": 20706234368,
+    "peak_working_set_bytes": null,
+    "peak_private_bytes": null
+  },
+  "evidence": {
+    "screenshot_status": "Opening screen captured in the session record; a repository-relative image file was not retained.",
+    "stdout": "Launch command returned with no PowerShell output.",
+    "stderr": null
+  },
+  "classification": {
+    "result": "passed",
+    "result_reason": "Packaged application launch was visibly successful. No model inference claim is made.",
+    "next_action": "Reboot if practical, recapture available RAM and storage, then obtain explicit approval before downloading exactly one model."
+  },
+  "notes": "The opening screen defaulted to Granite 4.0 H Micro Q4_K_M Balanced (1.94 GB). This was displayed only; no model was downloaded or selected."
+}
