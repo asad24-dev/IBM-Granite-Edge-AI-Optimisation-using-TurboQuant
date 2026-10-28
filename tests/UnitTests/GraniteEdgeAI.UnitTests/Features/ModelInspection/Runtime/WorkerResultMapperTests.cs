@@ -208,7 +208,7 @@ public sealed class WorkerResultMapperTests
 
         AssertOperationalFailure(
             result,
-            "MI-OP-WORKER-CLIENT-TERMINATION");
+            "MI-OP-WORKER-CLIENT-CRASH");
         StringAssert.DoesNotContain(
             result.Failure!.TechnicalDetail,
             secret,
@@ -231,7 +231,10 @@ public sealed class WorkerResultMapperTests
         "MI-OP-WORKER-CLIENT-PROTOCOL")]
     [DataRow(
         WorkerClientFailureCodes.WorkerOverallTimeout,
-        "MI-OP-WORKER-CLIENT-TERMINATION")]
+        "MI-OP-WORKER-CLIENT-TIMEOUT")]
+    [DataRow(
+        WorkerClientFailureCodes.WorkerExitMismatch,
+        "MI-OP-WORKER-CLIENT-EXIT-MISMATCH")]
     [DataRow(
         WorkerClientFailureCodes.WorkerCleanupFailed,
         "MI-OP-WORKER-CLIENT-CLEANUP")]

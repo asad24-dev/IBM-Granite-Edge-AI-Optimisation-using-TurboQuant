@@ -135,8 +135,7 @@ public sealed class InspectionWorkerClient : IInspectionWorkerClient
         {
             using VerifiedWorkerExecutable executable =
                 _resolver.Resolve(_options.ApprovedWorkerRoot);
-            operationEnvironment = TrustedToolOperationEnvironment.Create(
-                _parentEnvironmentProvider());
+            operationEnvironment = CreateOperationEnvironment();
             ProtectedWorkerLaunchSpec launchSpec = new(
                 executable,
                 _testOnlyArguments,
@@ -950,6 +949,26 @@ public sealed class InspectionWorkerClient : IInspectionWorkerClient
         string code,
         string message) =>
         WorkerClientPolicyException.For(code, message);
+
+    /// <summary>
+    /// Establishes the private, operation-owned temporary environment before
+    /// the worker is launched.  A failure here is a launch-environment policy
+    /// failure, not evidence that a child worker process crashed.
+    /// </summary>
+    private TrustedToolOperationEnvironment CreateOperationEnvironment()
+    {
+        try
+        {
+            return TrustedToolOperationEnvironment.Create(
+                _parentEnvironmentProvider());
+        }
+        catch (InvalidOperationException)
+        {
+            throw PolicyFailure(
+                WorkerClientFailureCodes.WorkerEnvironmentPolicyFailed,
+                "The Model Inspection worker environment could not be prepared.");
+        }
+    }
 
     private static bool IsExpectedProcessFailure(Exception error) =>
         error is IOException or

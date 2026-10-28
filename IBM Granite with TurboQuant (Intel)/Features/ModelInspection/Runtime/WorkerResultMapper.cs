@@ -363,11 +363,17 @@ internal sealed class WorkerResultMapper
         WorkerClientFailureCodes.WorkerOutputLimitExceeded =>
             "MI-OP-WORKER-CLIENT-PROTOCOL",
 
-        WorkerClientFailureCodes.WorkerCrashed or
-        WorkerClientFailureCodes.WorkerOverallTimeout or
-        WorkerClientFailureCodes.WorkerCancellationForced or
+        WorkerClientFailureCodes.WorkerCrashed =>
+            "MI-OP-WORKER-CLIENT-CRASH",
+
+        WorkerClientFailureCodes.WorkerOverallTimeout =>
+            "MI-OP-WORKER-CLIENT-TIMEOUT",
+
+        WorkerClientFailureCodes.WorkerCancellationForced =>
+            "MI-OP-WORKER-CLIENT-CANCELLATION",
+
         WorkerClientFailureCodes.WorkerExitMismatch =>
-            "MI-OP-WORKER-CLIENT-TERMINATION",
+            "MI-OP-WORKER-CLIENT-EXIT-MISMATCH",
 
         WorkerClientFailureCodes.WorkerCleanupFailed =>
             "MI-OP-WORKER-CLIENT-CLEANUP",

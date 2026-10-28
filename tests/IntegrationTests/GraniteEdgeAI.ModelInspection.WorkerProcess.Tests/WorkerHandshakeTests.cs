@@ -83,6 +83,41 @@ public sealed class WorkerHandshakeTests
             WorkerClientFailureCodes.WorkerHandshakeTimeout);
     }
 
+    [TestMethod]
+    public async Task InvalidOperationEnvironmentIsNotReportedAsWorkerCrash()
+    {
+        await using PublishedFixture fixture =
+            await PublishedFixture.CreateAsync().ConfigureAwait(false);
+        WorkerClientOptions options = new(
+            fixture.OutputDirectory,
+            StartupTimeout: TimeSpan.FromSeconds(3),
+            OverallTimeout: TimeSpan.FromSeconds(6),
+            CancellationGracePeriod: TimeSpan.FromSeconds(1),
+            MaximumRetainedStandardErrorBytes: 4 * 1024,
+            ProcessTreeCleanupTimeout: TimeSpan.FromSeconds(3));
+        InspectionWorkerClient client = new(
+            options,
+            "GraniteEdgeAI.ModelInspection.ProtocolTestWorker.exe",
+            WorkerProcessTestData.FixtureArguments("healthy-controlled-failure"),
+            () => new Dictionary<string, string?>(StringComparer.Ordinal)
+            {
+                ["SystemRoot"] = @"C:\\nonexistent-worker-environment-root",
+                ["WINDIR"] = @"C:\\nonexistent-worker-environment-root"
+            });
+
+        WorkerClientResult result = await client.ExecuteAsync(
+                WorkerProcessTestData.StartCommand(),
+                progress: null,
+                CancellationToken.None)
+            .ConfigureAwait(false);
+
+        AssertFailure(
+            result,
+            WorkerClientFailureCodes.WorkerEnvironmentPolicyFailed);
+        await WorkerProcessTestData.AssertNoFixtureProcessRemainsAsync()
+            .ConfigureAwait(false);
+    }
+
     private static async Task<WorkerClientResult> RunAsync(string scenario)
     {
         await using PublishedFixture fixture =

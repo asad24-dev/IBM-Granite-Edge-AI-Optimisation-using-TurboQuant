@@ -1257,16 +1257,17 @@
                         </StackPanel>
                     </Grid>
                     <Border
-                        x:Name="FailureDetailsArea"
+                        x:Name="InspectionFailureDiagnosticContainer"
                         Grid.Row="1"
                         Padding="14,10"
                         Background="{ThemeResource InspectionSubtleSurfaceBrush}"
                         BorderBrush="{ThemeResource InspectionBorderBrush}"
                         BorderThickness="{ThemeResource InspectionTopOutlineThickness}">
                         <StackPanel Spacing="4">
-                            <TextBlock Style="{StaticResource InspectionLabelStyle}" Text="INSPECTION DETAILS" />
-                            <TextBlock FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource InspectionErrorBrush}" Text="Diagnostic code: INSPECT-OP-001" TextWrapping="WrapWholeWords" />
-                            <TextBlock FontSize="12" Foreground="{ThemeResource InspectionMutedTextBrush}" Text="No model data was changed." TextWrapping="WrapWholeWords" />
+                            <TextBlock Style="{StaticResource InspectionLabelStyle}" Text="DIAGNOSTIC CODE" />
+                            <!-- The projection assigns only an allow-listed application diagnostic category here. -->
+                            <TextBlock x:Name="InspectionFailureDiagnostic" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource InspectionErrorBrush}" Text="Diagnostic code unavailable" TextWrapping="WrapWholeWords" />
+                            <TextBlock x:Name="InspectionFailureRecovery" FontSize="12" Foreground="{ThemeResource InspectionMutedTextBrush}" Text="Retry inspection or choose another model." TextWrapping="WrapWholeWords" />
                         </StackPanel>
                     </Border>
                     <Border

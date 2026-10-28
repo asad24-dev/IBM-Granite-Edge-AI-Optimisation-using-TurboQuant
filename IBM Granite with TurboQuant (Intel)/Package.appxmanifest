@@ -9,15 +9,15 @@
   IgnorableNamespaces="uap rescap systemai">
 
   <Identity
-    Name="488d3892-c214-40c5-9a6a-1154c1e69fff"
-    Publisher="CN=Arian"
-    Version="1.0.0.0" />
+    Name="GraniteEdgeAI.Asad.Development"
+    Publisher="CN=Granite Edge AI Development"
+    Version="1.0.0.4" />
 
-  <mp:PhoneIdentity PhoneProductId="488d3892-c214-40c5-9a6a-1154c1e69fff" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
+  <mp:PhoneIdentity PhoneProductId="97842843-188e-42bf-b315-59af96fcdba2" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
   <Properties>
-    <DisplayName>IBM Granite with TurboQuant (Intel)</DisplayName>
-    <PublisherDisplayName>Arian</PublisherDisplayName>
+    <DisplayName>Granite Edge AI — Development Diagnostic</DisplayName>
+    <PublisherDisplayName>Granite Edge AI Development</PublisherDisplayName>
     <Logo>Assets\StoreLogo.png</Logo>
   </Properties>
 
