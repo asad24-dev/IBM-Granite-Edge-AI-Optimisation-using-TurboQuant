@@ -11,7 +11,7 @@
   <Identity
     Name="GraniteEdgeAI.Asad.Development"
     Publisher="CN=Granite Edge AI Development"
-    Version="1.0.0.4" />
+    Version="1.0.0.5" />
 
   <mp:PhoneIdentity PhoneProductId="97842843-188e-42bf-b315-59af96fcdba2" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 
