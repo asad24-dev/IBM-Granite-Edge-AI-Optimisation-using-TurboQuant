@@ -20,6 +20,8 @@ public sealed class InspectionWorkerClient : IInspectionWorkerClient
         "The Model Inspection worker protocol conversation was invalid.";
     private const string OutputLimitMessage =
         "The Model Inspection worker output exceeded the approved byte limit.";
+    private const string WorkerEarlyExitMessage =
+        "The Model Inspection worker exited before completing startup.";
     private const string WorkerCrashedMessage =
         "The Model Inspection worker process ended unexpectedly.";
     private const string OverallTimeoutMessage =
@@ -834,8 +836,8 @@ public sealed class InspectionWorkerClient : IInspectionWorkerClient
             catch (TimeoutException)
             {
                 throw PolicyFailure(
-                    WorkerClientFailureCodes.WorkerCrashed,
-                    WorkerCrashedMessage);
+                    WorkerClientFailureCodes.WorkerEarlyExit,
+                    WorkerEarlyExitMessage);
             }
         }
         else
@@ -847,10 +849,10 @@ public sealed class InspectionWorkerClient : IInspectionWorkerClient
         {
             throw PolicyFailure(
                 processExitTask.IsCompleted
-                    ? WorkerClientFailureCodes.WorkerCrashed
+                    ? WorkerClientFailureCodes.WorkerEarlyExit
                     : WorkerClientFailureCodes.WorkerHandshakeInvalid,
                 processExitTask.IsCompleted
-                    ? WorkerCrashedMessage
+                    ? WorkerEarlyExitMessage
                     : HandshakeInvalidMessage);
         }
 

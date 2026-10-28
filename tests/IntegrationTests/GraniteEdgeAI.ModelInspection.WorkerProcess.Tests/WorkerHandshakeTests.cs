@@ -62,6 +62,16 @@ public sealed class WorkerHandshakeTests
     }
 
     [TestMethod]
+    public async Task WorkerExitBeforeHelloUsesDedicatedEarlyExitCategory()
+    {
+        WorkerClientResult result = await RunAsync("crash-before-hello")
+            .ConfigureAwait(false);
+
+        AssertFailure(
+            result,
+            WorkerClientFailureCodes.WorkerEarlyExit);
+    }
+    [TestMethod]
     public async Task MissingHelloUsesDedicatedStartupTimeout()
     {
         await using PublishedFixture fixture =

@@ -22,6 +22,7 @@ public static class WorkerClientFailureCodes
     public const string WorkerHandshakeTimeout = "worker_handshake_timeout";
     public const string WorkerHandshakeInvalid = "worker_handshake_invalid";
     public const string WorkerProtocolInvalid = "worker_protocol_invalid";
+    public const string WorkerEarlyExit = "worker_early_exit";
     public const string WorkerOutputLimitExceeded =
         "worker_output_limit_exceeded";
     public const string WorkerCrashed = "worker_crashed";
@@ -45,6 +46,7 @@ public static class WorkerClientFailureCodes
             WorkerHandshakeTimeout,
             WorkerHandshakeInvalid,
             WorkerProtocolInvalid,
+            WorkerEarlyExit,
             WorkerOutputLimitExceeded,
             WorkerCrashed,
             WorkerOverallTimeout,
