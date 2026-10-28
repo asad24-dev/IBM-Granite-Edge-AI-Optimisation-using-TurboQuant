@@ -363,9 +363,6 @@ internal sealed class WorkerResultMapper
         WorkerClientFailureCodes.WorkerOutputLimitExceeded =>
             "MI-OP-WORKER-CLIENT-PROTOCOL",
 
-        WorkerClientFailureCodes.WorkerEarlyExit =>
-            "MI-OP-WORKER-CLIENT-EARLY-EXIT",
-
         WorkerClientFailureCodes.WorkerCrashed =>
             "MI-OP-WORKER-CLIENT-CRASH",
 

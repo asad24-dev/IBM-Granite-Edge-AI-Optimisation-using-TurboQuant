@@ -230,9 +230,6 @@ public sealed class WorkerResultMapperTests
         WorkerClientFailureCodes.WorkerProtocolInvalid,
         "MI-OP-WORKER-CLIENT-PROTOCOL")]
     [DataRow(
-        WorkerClientFailureCodes.WorkerEarlyExit,
-        "MI-OP-WORKER-CLIENT-EARLY-EXIT")]
-    [DataRow(
         WorkerClientFailureCodes.WorkerOverallTimeout,
         "MI-OP-WORKER-CLIENT-TIMEOUT")]
     [DataRow(
