@@ -23,7 +23,7 @@ internal static class RuntimeEvidenceResolver
         {
             HardwareResolutionDiagnosticCode diagnostic = evidence.State !=
                 LlamaCppCapabilityEvidenceState.Available
-                    ? HardwareResolutionDiagnosticCode.LlamaCppUnavailable
+                    ? MapUnavailableDiagnostic(evidence.Diagnostic)
                     : freshness == EvidenceFreshness.Stale
                         ? HardwareResolutionDiagnosticCode.EvidenceStale
                         : HardwareResolutionDiagnosticCode.ClockFuture;
@@ -60,6 +60,33 @@ internal static class RuntimeEvidenceResolver
             [],
             hasCriticalFailure: false);
     }
+
+    private static HardwareResolutionDiagnosticCode MapUnavailableDiagnostic(
+        LlamaCppCapabilityDiagnosticCode? diagnostic) => diagnostic switch
+    {
+        LlamaCppCapabilityDiagnosticCode.IdentityStartFailed or
+        LlamaCppCapabilityDiagnosticCode.CapabilityStartFailed =>
+            HardwareResolutionDiagnosticCode.LlamaCppProbeStartFailed,
+        LlamaCppCapabilityDiagnosticCode.IdentityTimedOut or
+        LlamaCppCapabilityDiagnosticCode.IdentityOutputLimitExceeded or
+        LlamaCppCapabilityDiagnosticCode.IdentityCleanupFailed or
+        LlamaCppCapabilityDiagnosticCode.IdentityCancelledUnexpectedly or
+        LlamaCppCapabilityDiagnosticCode.IdentityNonZeroExit or
+        LlamaCppCapabilityDiagnosticCode.CapabilityTimedOut or
+        LlamaCppCapabilityDiagnosticCode.CapabilityOutputLimitExceeded or
+        LlamaCppCapabilityDiagnosticCode.CapabilityCleanupFailed or
+        LlamaCppCapabilityDiagnosticCode.CapabilityCancelledUnexpectedly or
+        LlamaCppCapabilityDiagnosticCode.CapabilityProcessFailed or
+        LlamaCppCapabilityDiagnosticCode.NativeCapabilityUnavailable =>
+            HardwareResolutionDiagnosticCode.LlamaCppProbeExecutionFailed,
+        LlamaCppCapabilityDiagnosticCode.ToolIdentityMismatch or
+        LlamaCppCapabilityDiagnosticCode.CommandContractMismatch or
+        LlamaCppCapabilityDiagnosticCode.IdentityOutputInvalid or
+        LlamaCppCapabilityDiagnosticCode.IdentityMismatch or
+        LlamaCppCapabilityDiagnosticCode.CapabilityOutputInvalid =>
+            HardwareResolutionDiagnosticCode.LlamaCppProbeProtocolInvalid,
+        _ => HardwareResolutionDiagnosticCode.LlamaCppUnavailable,
+    };
 
     private static LocalRuntimeBackend MapBackend(LlamaCppBackend backend) => backend switch
     {

@@ -46,20 +46,24 @@ public sealed class WindowsSystemSnapshotProvider
     public ValueTask<WindowsSystemSnapshot> CaptureAsync(CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (!_memoryApi.TryGetPhysicallyInstalledKilobytes(out ulong installedKilobytes) ||
-            !_memoryApi.TryGetMemoryStatus(out ulong usableBytes, out ulong availableBytes))
+        bool installedMemoryAvailable = _memoryApi.TryGetPhysicallyInstalledKilobytes(
+            out ulong installedKilobytes);
+        if (!_memoryApi.TryGetMemoryStatus(out ulong usableBytes, out ulong availableBytes))
         {
             throw new WindowsSystemSnapshotException(MemoryUnavailableCode);
         }
 
-        ulong installedBytes;
-        try
+        ulong installedBytes = usableBytes;
+        if (installedMemoryAvailable)
         {
-            installedBytes = checked(installedKilobytes * 1024UL);
-        }
-        catch (OverflowException)
-        {
-            throw new WindowsSystemSnapshotException(MemoryOverflowCode);
+            try
+            {
+                installedBytes = checked(installedKilobytes * 1024UL);
+            }
+            catch (OverflowException)
+            {
+                throw new WindowsSystemSnapshotException(MemoryOverflowCode);
+            }
         }
 
         if (installedBytes < usableBytes || usableBytes < availableBytes)

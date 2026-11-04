@@ -47,6 +47,47 @@ public sealed class HardwareInspectionOutcomePolicyTests
     }
 
     [TestMethod]
+    public void FromResolution_MapsOnlyAllowListedUnresolvedEvidenceCategories()
+    {
+        Guid inspectionId = Guid.NewGuid();
+        HardwareEvidenceResolutionResult baseline = ResolvedBaseline(inspectionId);
+        var cases = new[]
+        {
+            (HardwareResolutionDiagnosticCode.LlamaCppUnavailable,
+                "HI-RUNTIME-UNAVAILABLE"),
+            (HardwareResolutionDiagnosticCode.LlamaCppProbeStartFailed,
+                "HI-RUNTIME-PROBE-START"),
+            (HardwareResolutionDiagnosticCode.LlamaCppProbeExecutionFailed,
+                "HI-RUNTIME-PROBE-EXECUTION"),
+            (HardwareResolutionDiagnosticCode.LlamaCppProbeProtocolInvalid,
+                "HI-RUNTIME-PROBE-PROTOCOL"),
+            (HardwareResolutionDiagnosticCode.StorageUnavailable,
+                "HI-STORAGE-UNAVAILABLE"),
+            (HardwareResolutionDiagnosticCode.WindowsSystemUnavailable,
+                "HI-MEMORY-UNRESOLVED"),
+            (HardwareResolutionDiagnosticCode.ProcessorNameConflict,
+                "HI-PROCESSOR-UNRESOLVED"),
+            (HardwareResolutionDiagnosticCode.CaptureSpanExceeded,
+                "HI-EVIDENCE-TIMING"),
+        };
+
+        foreach ((HardwareResolutionDiagnosticCode diagnostic, string expectedCode) in cases)
+        {
+            HardwareEvidenceResolutionResult failed = HardwareEvidenceResolutionResult.Failure(
+                baseline.Evidence,
+                [diagnostic]);
+
+            HardwareInspectionRunResult result =
+                HardwareInspectionOutcomePolicy.FromResolution(inspectionId, failed);
+
+            Assert.AreEqual(HardwareInspectionOutcome.Failed, result.Outcome);
+            Assert.AreEqual(HardwareInspectionFailureKind.CriticalEvidence, result.FailureKind);
+            Assert.AreEqual(expectedCode, result.SafeDiagnosticCode);
+            Assert.IsNull(result.Snapshot);
+        }
+    }
+
+    [TestMethod]
     public void FromAcquisitionFailure_MapsOnlyClosedApplicationRepairCodes()
     {
         Guid inspectionId = Guid.NewGuid();

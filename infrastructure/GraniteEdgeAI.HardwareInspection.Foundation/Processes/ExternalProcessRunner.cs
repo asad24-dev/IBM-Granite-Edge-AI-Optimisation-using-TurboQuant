@@ -6,6 +6,12 @@ namespace GraniteEdgeAI.HardwareInspection.Foundation.Processes;
 public sealed class ExternalProcessRunner : IExternalProcessRunner
 {
     private static readonly TimeSpan CleanupDeadline = TimeSpan.FromSeconds(5);
+    private readonly string? _operationStorageRoot;
+
+    public ExternalProcessRunner(string? operationStorageRoot = null)
+    {
+        _operationStorageRoot = operationStorageRoot;
+    }
 
     public async Task<ExternalProcessResult> RunAsync(
         VerifiedTrustedTool tool,
@@ -45,6 +51,7 @@ public sealed class ExternalProcessRunner : IExternalProcessRunner
                         request,
                         elapsed,
                         job,
+                        _operationStorageRoot,
                         cancellationToken)
                     .ConfigureAwait(false);
             }
@@ -57,6 +64,7 @@ public sealed class ExternalProcessRunner : IExternalProcessRunner
         ExternalProcessRequest request,
         Stopwatch elapsed,
         WindowsKillOnCloseJob job,
+        string? operationStorageRoot,
         CancellationToken cancellationToken)
     {
 
@@ -64,6 +72,7 @@ public sealed class ExternalProcessRunner : IExternalProcessRunner
                 tool,
                 command,
                 job,
+                operationStorageRoot,
                 out WindowsSuspendedProcess? launched,
                 out bool startCleanupSucceeded))
         {

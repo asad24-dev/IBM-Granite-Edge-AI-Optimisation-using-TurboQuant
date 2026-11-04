@@ -83,7 +83,7 @@ public sealed class RuntimeEvidenceResolverTests
             (LlamaCppCapabilityEvidence.Unavailable(
                 HardwareResolutionTestData.Now,
                 LlamaCppCapabilityDiagnosticCode.NativeCapabilityUnavailable),
-                HardwareResolutionDiagnosticCode.LlamaCppUnavailable),
+                HardwareResolutionDiagnosticCode.LlamaCppProbeExecutionFailed),
         ];
 
         foreach ((LlamaCppCapabilityEvidence evidence, HardwareResolutionDiagnosticCode diagnostic) in cases)
@@ -96,6 +96,30 @@ public sealed class RuntimeEvidenceResolverTests
             Assert.IsTrue(result.Entries.All(static entry =>
                 entry.Resolution == EvidenceResolutionState.Unavailable));
             CollectionAssert.AreEqual(new[] { diagnostic }, result.Diagnostics.ToArray());
+        }
+    }
+
+    [TestMethod]
+    [TestCategory("Unit")]
+    public void Resolve_MapsUnavailableProbeDiagnosticsToOnlyThreeStableCategories()
+    {
+        var cases = new[]
+        {
+            (LlamaCppCapabilityDiagnosticCode.IdentityStartFailed,
+                HardwareResolutionDiagnosticCode.LlamaCppProbeStartFailed),
+            (LlamaCppCapabilityDiagnosticCode.CapabilityTimedOut,
+                HardwareResolutionDiagnosticCode.LlamaCppProbeExecutionFailed),
+            (LlamaCppCapabilityDiagnosticCode.IdentityOutputInvalid,
+                HardwareResolutionDiagnosticCode.LlamaCppProbeProtocolInvalid),
+        };
+
+        foreach ((LlamaCppCapabilityDiagnosticCode source, HardwareResolutionDiagnosticCode expected) in cases)
+        {
+            ComponentResolution<LocalRuntimeCapabilities> result = RuntimeEvidenceResolver.Resolve(
+                LlamaCppCapabilityEvidence.Unavailable(HardwareResolutionTestData.Now, source),
+                HardwareResolutionTestData.Now);
+
+            CollectionAssert.AreEqual(new[] { expected }, result.Diagnostics.ToArray());
         }
     }
 

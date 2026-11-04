@@ -21,9 +21,9 @@ internal sealed class FoundationHardwareEvidenceCapture : IHardwareEvidenceCaptu
     private readonly Func<VerifiedTrustedTool, CancellationToken, Task<LlmFitHardwareEvidence>> _captureLlmFit;
     private readonly Func<VerifiedTrustedTool, CancellationToken, Task<LlamaCppCapabilityEvidence>> _captureLlamaCpp;
 
-    internal FoundationHardwareEvidenceCapture()
+    internal FoundationHardwareEvidenceCapture(string? operationStorageRoot = null)
     {
-        IExternalProcessRunner processRunner = new ExternalProcessRunner();
+        IExternalProcessRunner processRunner = new ExternalProcessRunner(operationStorageRoot);
         _captureProcessor = new WindowsProcessorEvidenceProvider().CaptureAsync;
         _captureSystem = new WindowsSystemSnapshotProvider().CaptureAsync;
         _captureStorage = new WindowsStorageEvidenceProvider().CaptureAsync;

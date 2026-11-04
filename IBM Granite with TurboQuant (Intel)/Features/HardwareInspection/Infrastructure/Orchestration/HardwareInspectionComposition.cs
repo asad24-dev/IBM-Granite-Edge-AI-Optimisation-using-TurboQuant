@@ -1,6 +1,7 @@
 using GraniteEdgeAI.Features.HardwareInspection.Application;
 using GraniteEdgeAI.Features.HardwareInspection.Resolution;
 using System;
+using Windows.Storage;
 
 namespace GraniteEdgeAI.Features.HardwareInspection.Orchestration;
 
@@ -9,7 +10,8 @@ internal static class HardwareInspectionComposition
     internal static IHardwareInspectionService CreateProduction()
     {
         IHardwareToolAcquisition tools = FixedHardwareToolAcquisition.CreateProduction();
-        IHardwareEvidenceCapture capture = new FoundationHardwareEvidenceCapture();
+        IHardwareEvidenceCapture capture = new FoundationHardwareEvidenceCapture(
+            ApplicationData.Current.LocalFolder.Path);
         IHardwareEvidenceCollectionCoordinator collector =
             new HardwareEvidenceCollectionCoordinator(capture, TimeProvider.System);
         IHardwareEvidenceResolver resolver = new HardwareEvidenceResolver(TimeProvider.System);

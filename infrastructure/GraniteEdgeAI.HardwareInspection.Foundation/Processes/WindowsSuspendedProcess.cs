@@ -57,12 +57,27 @@ internal sealed class WindowsSuspendedProcess : IDisposable
         TrustedToolCommand command,
         WindowsKillOnCloseJob job,
         out WindowsSuspendedProcess? launched) =>
-        TryStart(tool, command, job, out launched, out bool _);
+        TryStart(tool, command, job, operationStorageRoot: null, out launched, out bool _);
 
     internal static bool TryStart(
         VerifiedTrustedTool tool,
         TrustedToolCommand command,
         WindowsKillOnCloseJob job,
+        out WindowsSuspendedProcess? launched,
+        out bool startCleanupSucceeded) =>
+        TryStart(
+            tool,
+            command,
+            job,
+            operationStorageRoot: null,
+            out launched,
+            out startCleanupSucceeded);
+
+    internal static bool TryStart(
+        VerifiedTrustedTool tool,
+        TrustedToolCommand command,
+        WindowsKillOnCloseJob job,
+        string? operationStorageRoot,
         out WindowsSuspendedProcess? launched,
         out bool startCleanupSucceeded)
     {
@@ -73,7 +88,9 @@ internal sealed class WindowsSuspendedProcess : IDisposable
         TrustedToolOperationEnvironment operationEnvironment;
         try
         {
-            operationEnvironment = TrustedToolEnvironmentPolicy.CaptureCurrent();
+            operationEnvironment = TrustedToolOperationEnvironment.CreateCurrent(
+                includeDotnetRoots: false,
+                localApplicationDataOverride: operationStorageRoot);
         }
         catch (InvalidOperationException error)
         {
@@ -182,6 +199,7 @@ internal sealed class WindowsSuspendedProcess : IDisposable
         ProcessInformation processInformation = default;
         bool processCreated = false;
         IntPtr attributeList = IntPtr.Zero;
+        IntPtr jobHandleList = IntPtr.Zero;
         IntPtr inheritedHandleList = IntPtr.Zero;
         bool attributeListInitialized = false;
         SafeProcessHandle? processHandle = null;
@@ -204,10 +222,12 @@ internal sealed class WindowsSuspendedProcess : IDisposable
                 standardOutput.ClientSafePipeHandle.DangerousGetHandle(),
                 standardError.ClientSafePipeHandle.DangerousGetHandle(),
             ];
-            if (!TryCreateExplicitHandleList(
+            if (!TryCreateLaunchAttributeList(
                     inheritedHandles,
+                    job.Handle,
                     out attributeList,
-                    out inheritedHandleList))
+                    out inheritedHandleList,
+                    out jobHandleList))
             {
                 return false;
             }
@@ -240,7 +260,7 @@ internal sealed class WindowsSuspendedProcess : IDisposable
                 IntPtr.Zero,
                 IntPtr.Zero,
                 inheritHandles: true,
-                CreateNoWindow | CreateSuspended | ExtendedStartupInfoPresent |
+                CreateNoWindow | ExtendedStartupInfoPresent |
                     CreateUnicodeEnvironment,
                 environment.Pointer,
                 workingDirectory,
@@ -254,18 +274,12 @@ internal sealed class WindowsSuspendedProcess : IDisposable
                 return false;
             }
 
-            if (!job.TryAssign(processInformation.Process) ||
-                !job.ContainsProcess(processInformation.Process))
+            if (!job.ContainsProcess(processInformation.Process))
             {
                 return false;
             }
 
             process = Process.GetProcessById(checked((int)processInformation.ProcessId));
-            if (ResumeThread(processInformation.Thread) == uint.MaxValue)
-            {
-                return false;
-            }
-
             processHandle = new SafeProcessHandle(
                 processInformation.Process,
                 ownsHandle: true);
@@ -301,6 +315,7 @@ internal sealed class WindowsSuspendedProcess : IDisposable
                 process,
                 attributeListInitialized,
                 attributeList,
+                jobHandleList,
                 inheritedHandleList,
                 processInformation,
                 processHandle,
@@ -317,6 +332,7 @@ internal sealed class WindowsSuspendedProcess : IDisposable
         Process? process,
         bool attributeListInitialized,
         IntPtr attributeList,
+        IntPtr jobHandleList,
         IntPtr inheritedHandleList,
         ProcessInformation processInformation,
         SafeProcessHandle? processHandle,
@@ -347,6 +363,10 @@ internal sealed class WindowsSuspendedProcess : IDisposable
                 if (inheritedHandleList != IntPtr.Zero)
                 {
                     Marshal.FreeHGlobal(inheritedHandleList);
+                }
+                if (jobHandleList != IntPtr.Zero)
+                {
+                    Marshal.FreeHGlobal(jobHandleList);
                 }
                 if (attributeList != IntPtr.Zero)
                 {
@@ -403,17 +423,20 @@ internal sealed class WindowsSuspendedProcess : IDisposable
     internal bool TryGetExitCode(out int exitCode) =>
         NativeProcessExitCodeAuthority.TryRead(ProcessHandle, out exitCode);
 
-    private static bool TryCreateExplicitHandleList(
+    private static bool TryCreateLaunchAttributeList(
         IntPtr[] handles,
+        IntPtr jobHandle,
         out IntPtr attributeList,
-        out IntPtr inheritedHandleList)
+        out IntPtr inheritedHandleList,
+        out IntPtr jobHandleList)
     {
         attributeList = IntPtr.Zero;
         inheritedHandleList = IntPtr.Zero;
+        jobHandleList = IntPtr.Zero;
         nuint attributeListSize = 0;
         _ = InitializeProcThreadAttributeList(
             IntPtr.Zero,
-            attributeCount: 1,
+            attributeCount: 2,
             flags: 0,
             ref attributeListSize);
         if (attributeListSize == 0)
@@ -424,7 +447,7 @@ internal sealed class WindowsSuspendedProcess : IDisposable
         attributeList = Marshal.AllocHGlobal(checked((nint)attributeListSize));
         if (!InitializeProcThreadAttributeList(
                 attributeList,
-                attributeCount: 1,
+                attributeCount: 2,
                 flags: 0,
                 ref attributeListSize))
         {
@@ -443,16 +466,30 @@ internal sealed class WindowsSuspendedProcess : IDisposable
                     handles[index]);
             }
 
-            if (UpdateProcThreadAttribute(
+            bool handlesAttached = UpdateProcThreadAttribute(
+                attributeList,
+                flags: 0,
+                new IntPtr(ProcThreadAttributeHandleList),
+                inheritedHandleList,
+                checked((nuint)handleListSize),
+                IntPtr.Zero,
+                IntPtr.Zero);
+            if (handlesAttached)
+            {
+                jobHandleList = Marshal.AllocHGlobal(IntPtr.Size);
+                Marshal.WriteIntPtr(jobHandleList, jobHandle);
+                bool jobAttached = UpdateProcThreadAttribute(
                     attributeList,
                     flags: 0,
-                    new IntPtr(ProcThreadAttributeHandleList),
-                    inheritedHandleList,
-                    checked((nuint)handleListSize),
+                    new IntPtr(ProcThreadAttributeJobList),
+                    jobHandleList,
+                    checked((nuint)IntPtr.Size),
                     IntPtr.Zero,
-                    IntPtr.Zero))
-            {
-                return true;
+                    IntPtr.Zero);
+                if (jobAttached)
+                {
+                    return true;
+                }
             }
         }
         catch
@@ -462,16 +499,29 @@ internal sealed class WindowsSuspendedProcess : IDisposable
             {
                 Marshal.FreeHGlobal(inheritedHandleList);
             }
+            if (jobHandleList != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(jobHandleList);
+            }
 
             attributeList = IntPtr.Zero;
             inheritedHandleList = IntPtr.Zero;
+            jobHandleList = IntPtr.Zero;
             throw;
         }
 
         DeleteProcThreadAttributeList(attributeList);
-        Marshal.FreeHGlobal(inheritedHandleList);
+        if (inheritedHandleList != IntPtr.Zero)
+        {
+            Marshal.FreeHGlobal(inheritedHandleList);
+        }
+        if (jobHandleList != IntPtr.Zero)
+        {
+            Marshal.FreeHGlobal(jobHandleList);
+        }
         attributeList = IntPtr.Zero;
         inheritedHandleList = IntPtr.Zero;
+        jobHandleList = IntPtr.Zero;
         return false;
     }
 
@@ -541,12 +591,12 @@ internal sealed class WindowsSuspendedProcess : IDisposable
     }
 
     private const int MaximumCommandLineLength = 32_767;
-    private const uint CreateSuspended = 0x00000004;
     private const uint CreateUnicodeEnvironment = 0x00000400;
     private const uint ExtendedStartupInfoPresent = 0x00080000;
     private const uint CreateNoWindow = 0x08000000;
     private const uint StartfUseStdHandles = 0x00000100;
     private const int ProcThreadAttributeHandleList = 0x00020002;
+    private const int ProcThreadAttributeJobList = 0x0002000D;
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
@@ -587,10 +637,6 @@ internal sealed class WindowsSuspendedProcess : IDisposable
     [DllImport("kernel32.dll")]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     private static extern void DeleteProcThreadAttributeList(IntPtr attributeList);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
-    private static extern uint ResumeThread(IntPtr thread);
 
     [DllImport("kernel32.dll", SetLastError = true)]
     [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]

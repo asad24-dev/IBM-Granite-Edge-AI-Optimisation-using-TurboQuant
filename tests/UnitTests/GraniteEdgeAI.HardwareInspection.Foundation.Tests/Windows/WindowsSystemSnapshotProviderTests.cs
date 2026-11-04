@@ -55,11 +55,28 @@ public sealed class WindowsSystemSnapshotProviderTests
     }
 
     [TestMethod]
-    public async Task CaptureMapsNativeFailureToStableDiagnostic()
+    public async Task CaptureFallsBackToOsVisiblePhysicalMemoryWhenInstalledMemoryApiIsUnavailable()
     {
         FakeWindowsMemoryApi api = new(1024, 1024 * 1024, 0)
         {
             InstalledSucceeds = false,
+        };
+
+        WindowsSystemSnapshot snapshot = await CreateProvider(api).CaptureAsync(CancellationToken.None);
+
+        Assert.AreEqual(1024UL * 1024 * 1024, snapshot.PhysicallyInstalledBytes);
+        Assert.AreEqual(1024UL * 1024 * 1024, snapshot.OsUsablePhysicalBytes);
+        Assert.AreEqual(0UL, snapshot.AvailablePhysicalBytes);
+        Assert.AreEqual(1, api.InstalledCalls);
+        Assert.AreEqual(1, api.StatusCalls);
+    }
+
+    [TestMethod]
+    public async Task CaptureMapsUnavailableStatusApiToStableDiagnostic()
+    {
+        FakeWindowsMemoryApi api = new(1024, 1024 * 1024, 0)
+        {
+            StatusSucceeds = false,
         };
 
         WindowsSystemSnapshotException error =

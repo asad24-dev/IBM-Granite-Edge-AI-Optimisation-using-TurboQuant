@@ -107,11 +107,11 @@ internal static class MemorySystemEvidenceResolver
             Entry("memory.installedBytes", EvidenceResolutionState.ResolvedPrimary,
                 snapshot.CapturedAtUtc),
             totalConflict
-                ? Entry("memory.osUsableBytes", EvidenceResolutionState.Conflict,
+                ? Entry("memory.osUsableBytes", EvidenceResolutionState.ResolvedPrimary,
                     snapshot.CapturedAtUtc, HardwareResolutionDiagnosticCode.TotalMemoryConflict)
                 : Entry("memory.osUsableBytes", corroboration, snapshot.CapturedAtUtc),
             availableConflict
-                ? Entry("memory.availableBytes", EvidenceResolutionState.Conflict,
+                ? Entry("memory.availableBytes", EvidenceResolutionState.ResolvedPrimary,
                     snapshot.CapturedAtUtc, HardwareResolutionDiagnosticCode.AvailableMemoryConflict)
                 : Entry("memory.availableBytes", corroboration, snapshot.CapturedAtUtc),
             Entry("os.name", EvidenceResolutionState.ResolvedPrimary, snapshot.CapturedAtUtc),
@@ -119,27 +119,25 @@ internal static class MemorySystemEvidenceResolver
             Entry("os.architecture", EvidenceResolutionState.ResolvedPrimary, snapshot.CapturedAtUtc),
         ];
 
-        bool criticalFailure = totalConflict || availableConflict;
-        MemoryFacts? memory = criticalFailure
-            ? null
-            : new MemoryFacts(
-                snapshot.PhysicallyInstalledBytes,
-                snapshot.OsUsablePhysicalBytes,
-                snapshot.AvailablePhysicalBytes,
-                snapshot.CapturedAtUtc);
-        OperatingSystemFacts? operatingSystem = criticalFailure
-            ? null
-            : new OperatingSystemFacts(
-                snapshot.OperatingSystemName,
-                snapshot.OperatingSystemVersion,
-                snapshot.OperatingSystemArchitecture);
+        // Windows supplies the canonical local-memory facts. A disagreement from
+        // the optional LLM-fit tool remains visible as a safe diagnostic, but it
+        // must not discard otherwise valid primary evidence or block the report.
+        MemoryFacts memory = new(
+            snapshot.PhysicallyInstalledBytes,
+            snapshot.OsUsablePhysicalBytes,
+            snapshot.AvailablePhysicalBytes,
+            snapshot.CapturedAtUtc);
+        OperatingSystemFacts operatingSystem = new(
+            snapshot.OperatingSystemName,
+            snapshot.OperatingSystemVersion,
+            snapshot.OperatingSystemArchitecture);
 
         return new MemorySystemResolution(
             memory,
             operatingSystem,
             entries,
             diagnostics,
-            criticalFailure);
+            hasCriticalFailure: false);
     }
 
     private static MemorySystemResolution FailureForUnavailableWindows(

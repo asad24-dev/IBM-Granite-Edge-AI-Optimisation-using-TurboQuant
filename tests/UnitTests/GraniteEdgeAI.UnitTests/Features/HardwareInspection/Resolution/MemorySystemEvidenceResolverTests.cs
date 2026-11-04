@@ -84,7 +84,7 @@ public sealed class MemorySystemEvidenceResolverTests
 
     [TestMethod]
     [TestCategory("Unit")]
-    public void Resolve_TotalMemoryAcceptsExactOneGiBToleranceAndRejectsOneByteBeyond()
+    public void Resolve_TotalMemoryRecordsConflictWithoutDiscardingWindowsFacts()
     {
         double acceptedTotal = BytesToGiB(32 * HardwareResolutionTestData.GiB);
         double rejectedTotal = BytesToGiB(32 * HardwareResolutionTestData.GiB + 1);
@@ -97,7 +97,7 @@ public sealed class MemorySystemEvidenceResolverTests
             HardwareResolutionTestData.WindowsSystem());
 
         Assert.IsFalse(accepted.HasCriticalFailure);
-        AssertCriticalFailure(
+        AssertWindowsPrimaryConflict(
             rejected,
             HardwareResolutionDiagnosticCode.TotalMemoryConflict,
             entryIndex: 1,
@@ -106,7 +106,7 @@ public sealed class MemorySystemEvidenceResolverTests
 
     [TestMethod]
     [TestCategory("Unit")]
-    public void Resolve_AvailableMemoryUsesExactTenPercentToleranceBoundary()
+    public void Resolve_AvailableMemoryRecordsConflictWithoutDiscardingWindowsFacts()
     {
         ulong tolerance = HardwareEvidenceNormalizer.GetAvailableMemoryTolerance(
             31 * HardwareResolutionTestData.GiB);
@@ -121,7 +121,7 @@ public sealed class MemorySystemEvidenceResolverTests
             HardwareResolutionTestData.WindowsSystem());
 
         Assert.IsFalse(accepted.HasCriticalFailure);
-        AssertCriticalFailure(
+        AssertWindowsPrimaryConflict(
             rejected,
             HardwareResolutionDiagnosticCode.AvailableMemoryConflict,
             entryIndex: 2,
@@ -142,7 +142,7 @@ public sealed class MemorySystemEvidenceResolverTests
             operatingSystemVersion: "10.0.26100",
             operatingSystemArchitecture: "x64");
 
-        AssertCriticalFailure(
+        AssertWindowsPrimaryConflict(
             Resolve(
                 AvailableLlmFit(halfByte, 0),
                 windows),
@@ -275,16 +275,16 @@ public sealed class MemorySystemEvidenceResolverTests
             expected,
             result.Entries.Select(static entry => entry.Resolution).ToArray());
 
-    private static void AssertCriticalFailure(
+    private static void AssertWindowsPrimaryConflict(
         MemorySystemResolution result,
         HardwareResolutionDiagnosticCode diagnostic,
         int entryIndex,
         string token)
     {
-        Assert.IsTrue(result.HasCriticalFailure);
-        Assert.IsNull(result.Memory);
-        Assert.IsNull(result.OperatingSystem);
-        Assert.AreEqual(EvidenceResolutionState.Conflict, result.Entries[entryIndex].Resolution);
+        Assert.IsFalse(result.HasCriticalFailure);
+        Assert.IsNotNull(result.Memory);
+        Assert.IsNotNull(result.OperatingSystem);
+        Assert.AreEqual(EvidenceResolutionState.ResolvedPrimary, result.Entries[entryIndex].Resolution);
         Assert.AreEqual(token, result.Entries[entryIndex].SafeDiagnosticCode);
         CollectionAssert.Contains(result.Diagnostics.ToArray(), diagnostic);
     }

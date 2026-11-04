@@ -81,6 +81,25 @@ public sealed class NativeProcessExitCodeAuthorityTests
         StringAssert.Contains(authority, "GetExitCodeProcess");
     }
 
+    [TestMethod]
+    public void HardwareProbeContainmentIsAppliedAtProcessCreation()
+    {
+        string repositoryRoot = FindRepositoryRoot();
+        string launcher = File.ReadAllText(Path.Combine(
+            repositoryRoot,
+            "infrastructure",
+            "GraniteEdgeAI.HardwareInspection.Foundation",
+            "Processes",
+            "WindowsSuspendedProcess.cs"));
+
+        StringAssert.Contains(launcher, "attributeCount: 2");
+        StringAssert.Contains(launcher, "ProcThreadAttributeJobList");
+        StringAssert.Contains(launcher, "job.Handle");
+        StringAssert.DoesNotContain(launcher, "job.TryAssign(");
+        StringAssert.DoesNotContain(launcher, "CreateSuspended");
+        StringAssert.DoesNotContain(launcher, "ResumeThread(");
+    }
+
     private static string FindRepositoryRoot()
     {
         DirectoryInfo? directory = new(AppContext.BaseDirectory);
