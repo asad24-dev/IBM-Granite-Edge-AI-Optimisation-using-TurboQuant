@@ -12,9 +12,9 @@ The project also studies memory, speed and quality across selected llama.cpp and
 
 ## Start here
 
-**To run the app:** follow [Packaged app installation and model setup](#setup-and-first-use) below. No Git, Visual Studio or source build is needed. **To develop the app:** use [Set up from source](docs/manuals/Fresh-Computer-Setup.md); its runtime-input requirements still apply.
+**To run the current fork package:** download [release `v1.0.5.0`](https://github.com/asad24-dev/IBM-Granite-Edge-AI-Optimisation-using-TurboQuant/releases/tag/v1.0.5.0) and follow [its short installer guide](build-version-1.0.5.0/START-HERE.md). No Git, Visual Studio or source build is needed. **To develop the app:** use [Set up from source](docs/manuals/Fresh-Computer-Setup.md); its runtime-input requirements still apply.
 
-The versioned school download instructions are in [build 1.0.4.0](build-version-1.0.4.0/README.md).
+The original upstream 1.0.4.0 instructions remain in [build 1.0.4.0](build-version-1.0.4.0/README.md) as historical documentation. Use the fork's 1.0.5.0 release for the current package.
 
 ## Main features
 
