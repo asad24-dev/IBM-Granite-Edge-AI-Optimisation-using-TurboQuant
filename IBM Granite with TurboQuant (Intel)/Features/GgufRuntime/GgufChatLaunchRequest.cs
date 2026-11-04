@@ -17,7 +17,8 @@ internal sealed class GgufChatLaunchRequest
         ReadOnlySpan<byte> trustedManifest,
         string modelFile,
         string displayName,
-        GgufRuntimeConfiguration configuration)
+        GgufRuntimeConfiguration configuration,
+        string? operationStorageRoot = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(packageRoot);
         ArgumentException.ThrowIfNullOrWhiteSpace(modelFile);
@@ -74,6 +75,7 @@ internal sealed class GgufChatLaunchRequest
         ModelFile = RequireExistingAbsoluteFile(modelFile, nameof(modelFile));
         DisplayName = displayName.Trim();
         Configuration = configuration;
+        OperationStorageRoot = operationStorageRoot;
         this.trustedManifest = trustedManifest.ToArray();
     }
 
@@ -87,6 +89,12 @@ internal sealed class GgufChatLaunchRequest
     internal string DisplayName { get; }
 
     internal GgufRuntimeConfiguration Configuration { get; }
+
+    /// <summary>
+    /// Optional package-owned local storage for the worker's private temporary
+    /// files. MSIX workers must not inherit the desktop LocalAppData location.
+    /// </summary>
+    internal string? OperationStorageRoot { get; }
 
     internal async Task VerifyModelAsync(CancellationToken cancellationToken)
     {

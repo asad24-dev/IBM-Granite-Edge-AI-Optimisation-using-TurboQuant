@@ -3310,7 +3310,11 @@ namespace GraniteEdgeAI.Features.Onboarding
                 authority.RuntimePackageRoot,
                 authority.TrustedRuntimeManifest);
             _ggufChatRouteRegistered = CurrentModelChatLaunchRegistry.RegisterRoute(
-                new GgufCurrentModelChatRouteLauncher(accessor, ShowGgufChat, SwitchCurrentGgufSharedAsync));
+                new GgufCurrentModelChatRouteLauncher(
+                    accessor,
+                    ShowGgufChat,
+                    SwitchCurrentGgufSharedAsync,
+                    Windows.Storage.ApplicationData.Current.LocalFolder.Path));
         }
 
         private async Task<bool> SwitchCurrentGgufSharedAsync(GgufChatLaunchRequest request, CancellationToken token)

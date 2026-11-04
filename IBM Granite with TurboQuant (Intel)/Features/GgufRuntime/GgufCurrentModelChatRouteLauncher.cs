@@ -16,7 +16,8 @@ namespace GraniteEdgeAI.Features.GgufRuntime;
 internal sealed class GgufCurrentModelChatRouteLauncher(
     GgufOptimizationProductionAuthorityAccessor authority,
     Action<ChatPage, ChatDemoController> showChat,
-    Func<GgufChatLaunchRequest, CancellationToken, Task<bool>>? switchSharedChat = null)
+    Func<GgufChatLaunchRequest, CancellationToken, Task<bool>>? switchSharedChat = null,
+    string? operationStorageRoot = null)
     : ICurrentModelChatRouteLauncher
 {
     private readonly GgufOptimizationProductionAuthorityAccessor _authority =
@@ -49,7 +50,8 @@ internal sealed class GgufCurrentModelChatRouteLauncher(
             _authority.TrustedRuntimeManifest.Span,
             sourceLease.SourcePath,
             "Selected model",
-            configuration);
+            configuration,
+            operationStorageRoot);
         if (switchSharedChat is not null && await switchSharedChat(request, cancellationToken))
             return CurrentModelChatLaunchResult.Success;
         var page = new ChatPage();

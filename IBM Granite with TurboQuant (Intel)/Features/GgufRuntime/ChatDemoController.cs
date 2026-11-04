@@ -210,7 +210,8 @@ internal sealed class ChatDemoController : IAsyncDisposable
             GgufRuntimeClient.CreateFromPackage(
                 request.PackageRoot,
                 request.TrustedManifest.Span,
-                request.ModelFile), cancellationToken);
+                request.ModelFile,
+                request.OperationStorageRoot), cancellationToken);
         cancellationToken.ThrowIfCancellationRequested();
         await request.VerifyModelAsync(cancellationToken);
         return await CreateInitializedProductionAsync(

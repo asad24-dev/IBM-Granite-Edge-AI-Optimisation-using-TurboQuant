@@ -16,13 +16,16 @@ public sealed class GgufRuntimeClient
 {
     private readonly string _workerExecutable;
     private readonly GgufWorkerBootstrap _bootstrap;
+    private readonly string? _operationStorageRoot;
 
     private GgufRuntimeClient(
         string workerExecutable,
-        GgufWorkerBootstrap bootstrap)
+        GgufWorkerBootstrap bootstrap,
+        string? operationStorageRoot = null)
     {
         _workerExecutable = workerExecutable;
         _bootstrap = bootstrap;
+        _operationStorageRoot = operationStorageRoot;
     }
 
     internal static GgufRuntimeClient CreateForTesting(
@@ -38,7 +41,8 @@ public sealed class GgufRuntimeClient
 
     public static GgufRuntimeClient Create(
         VerifiedGgufRuntimePackage package,
-        string modelFile)
+        string modelFile,
+        string? operationStorageRoot = null)
     {
         ArgumentNullException.ThrowIfNull(package);
         string supervisor = RequireExistingAbsoluteFile(
@@ -46,7 +50,8 @@ public sealed class GgufRuntimeClient
             nameof(package));
         return new GgufRuntimeClient(
             supervisor,
-            CreateBootstrap(package, modelFile));
+            CreateBootstrap(package, modelFile),
+            operationStorageRoot);
     }
 
     internal static GgufWorkerBootstrap CreateBootstrap(
@@ -77,7 +82,8 @@ public sealed class GgufRuntimeClient
     public static GgufRuntimeClient CreateFromPackage(
         string packageRoot,
         ReadOnlySpan<byte> trustedManifest,
-        string modelFile)
+        string modelFile,
+        string? operationStorageRoot = null)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(packageRoot);
         string root = Path.GetFullPath(packageRoot);
@@ -85,7 +91,7 @@ public sealed class GgufRuntimeClient
             root,
             trustedManifest,
             Path.Combine(root, GgufRuntimePackageLoader.DetachedManifestFileName));
-        return Create(package, modelFile);
+        return Create(package, modelFile, operationStorageRoot);
     }
 
     public async Task<GgufRuntimeSession> StartAsync(
@@ -96,7 +102,9 @@ public sealed class GgufRuntimeClient
         ArgumentNullException.ThrowIfNull(configuration);
         ArgumentNullException.ThrowIfNull(initialTurns);
         TrustedToolOperationEnvironment operationEnvironment =
-            TrustedToolOperationEnvironment.CreateCurrent(includeDotnetRoots: true);
+            TrustedToolOperationEnvironment.CreateCurrent(
+                includeDotnetRoots: true,
+                localApplicationDataOverride: _operationStorageRoot);
         GgufWorkerProcessSession process;
         try
         {
