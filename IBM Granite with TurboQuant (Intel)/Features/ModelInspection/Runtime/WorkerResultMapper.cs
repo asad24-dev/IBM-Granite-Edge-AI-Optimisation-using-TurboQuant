@@ -357,6 +357,12 @@ internal sealed class WorkerResultMapper
         WorkerClientFailureCodes.WorkerEnvironmentPolicyFailed =>
             "MI-OP-WORKER-CLIENT-LAUNCH",
 
+        WorkerClientFailureCodes.WorkerEnvironmentStorageFailed =>
+            "MI-OP-WORKER-CLIENT-TEMP-STORAGE",
+
+        WorkerClientFailureCodes.WorkerEnvironmentAccessControlFailed =>
+            "MI-OP-WORKER-CLIENT-TEMP-ACL",
+
         WorkerClientFailureCodes.WorkerHandshakeTimeout or
         WorkerClientFailureCodes.WorkerHandshakeInvalid or
         WorkerClientFailureCodes.WorkerProtocolInvalid or

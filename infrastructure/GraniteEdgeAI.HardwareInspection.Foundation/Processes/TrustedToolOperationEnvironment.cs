@@ -7,6 +7,28 @@ using Microsoft.Win32.SafeHandles;
 
 namespace GraniteEdgeAI.HardwareInspection.Foundation.Processes;
 
+/// <summary>
+/// Contains only stable, non-sensitive categories for preparation of a
+/// protected temporary environment.
+/// </summary>
+public enum TrustedToolOperationEnvironmentFailureKind
+{
+    Storage,
+    AccessControl,
+    Policy,
+}
+
+/// <summary>
+/// Reports a safe preparation category without retaining paths, identities,
+/// operating-system errors, or other untrusted details.
+/// </summary>
+public sealed class TrustedToolOperationEnvironmentSetupException(
+    TrustedToolOperationEnvironmentFailureKind kind,
+    string message) : InvalidOperationException(message)
+{
+    public TrustedToolOperationEnvironmentFailureKind Kind { get; } = kind;
+}
+
 public sealed class TrustedToolOperationEnvironment : IDisposable
 {
     private const int MaximumEntries = 512;
@@ -49,6 +71,11 @@ public sealed class TrustedToolOperationEnvironment : IDisposable
     }
 
     public static TrustedToolOperationEnvironment CreateCurrent(bool includeDotnetRoots)
+        => CreateCurrent(includeDotnetRoots, localApplicationDataOverride: null);
+
+    public static TrustedToolOperationEnvironment CreateCurrent(
+        bool includeDotnetRoots,
+        string? localApplicationDataOverride)
     {
         var environment = new Dictionary<string, string?>(StringComparer.Ordinal)
         {
@@ -62,7 +89,7 @@ public sealed class TrustedToolOperationEnvironment : IDisposable
                 Environment.GetEnvironmentVariable("DOTNET_ROOT_X64");
         }
 
-        return Create(environment);
+        return Create(environment, localApplicationDataOverride);
     }
 
     internal static TrustedToolOperationEnvironment Create(
@@ -97,15 +124,21 @@ public sealed class TrustedToolOperationEnvironment : IDisposable
         string operationDirectory = Path.Combine(
             ownedRoot,
             "operation-" + Guid.NewGuid().ToString("N"));
+        TrustedToolOperationEnvironmentFailureKind failureKind =
+            TrustedToolOperationEnvironmentFailureKind.Storage;
         try
         {
             rootCustody = OpenRootCustody(ownedRoot);
             Directory.CreateDirectory(operationDirectory);
+            failureKind = TrustedToolOperationEnvironmentFailureKind.AccessControl;
             ApplyPrivateAcl(operationDirectory);
+            failureKind = TrustedToolOperationEnvironmentFailureKind.Storage;
             EnsureNonReparseAncestry(operationDirectory);
             operationCustody = OpenDirectoryCustody(operationDirectory);
             RequireSameVolume(rootCustody, operationCustody);
+            failureKind = TrustedToolOperationEnvironmentFailureKind.AccessControl;
             VerifyPrivateAcl(operationDirectory);
+            failureKind = TrustedToolOperationEnvironmentFailureKind.Policy;
 
             var values = new Dictionary<string, string?>(
                 explicitEnvironment,
@@ -130,7 +163,7 @@ public sealed class TrustedToolOperationEnvironment : IDisposable
                 operationDirectory,
                 operationCustody);
             operationCustody = null;
-            throw Failure(cleanupSucceeded);
+            throw Failure(failureKind, cleanupSucceeded);
         }
         finally
         {
@@ -632,7 +665,17 @@ public sealed class TrustedToolOperationEnvironment : IDisposable
     }
 
     private static InvalidOperationException Failure(bool? partialCleanupSucceeded = null) =>
-        new(partialCleanupSucceeded == false
-            ? "The trusted hardware tool environment could not be secured and partial cleanup could not be verified."
-            : "The trusted hardware tool environment could not be secured.");
+        new(
+            partialCleanupSucceeded == false
+                ? "The trusted hardware tool environment could not be secured and partial cleanup could not be verified."
+                : "The trusted hardware tool environment could not be secured.");
+
+    private static TrustedToolOperationEnvironmentSetupException Failure(
+        TrustedToolOperationEnvironmentFailureKind kind,
+        bool? partialCleanupSucceeded) =>
+        new(
+            kind,
+            partialCleanupSucceeded == false
+                ? "The trusted hardware tool environment could not be secured and partial cleanup could not be verified."
+                : "The trusted hardware tool environment could not be secured.");
 }

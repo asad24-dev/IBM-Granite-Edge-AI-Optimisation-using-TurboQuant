@@ -227,6 +227,12 @@ public sealed class WorkerResultMapperTests
         WorkerClientFailureCodes.WorkerEnvironmentPolicyFailed,
         "MI-OP-WORKER-CLIENT-LAUNCH")]
     [DataRow(
+        WorkerClientFailureCodes.WorkerEnvironmentStorageFailed,
+        "MI-OP-WORKER-CLIENT-TEMP-STORAGE")]
+    [DataRow(
+        WorkerClientFailureCodes.WorkerEnvironmentAccessControlFailed,
+        "MI-OP-WORKER-CLIENT-TEMP-ACL")]
+    [DataRow(
         WorkerClientFailureCodes.WorkerProtocolInvalid,
         "MI-OP-WORKER-CLIENT-PROTOCOL")]
     [DataRow(

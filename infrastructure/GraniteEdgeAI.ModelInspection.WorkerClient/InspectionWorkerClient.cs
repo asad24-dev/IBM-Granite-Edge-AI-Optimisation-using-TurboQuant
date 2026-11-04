@@ -39,6 +39,7 @@ public sealed class InspectionWorkerClient : IInspectionWorkerClient
     private readonly IReadOnlyList<string> _testOnlyArguments;
     private readonly Func<IReadOnlyDictionary<string, string?>>
         _parentEnvironmentProvider;
+    private readonly string? _operationStorageRoot;
 
     /// <summary>
     /// Creates the production adapter for the one fixed package-relative
@@ -52,6 +53,24 @@ public sealed class InspectionWorkerClient : IInspectionWorkerClient
             Array.Empty<string>(),
             CaptureParentEnvironment)
     {
+    }
+
+    /// <summary>
+    /// Creates the production adapter with an application-owned local storage
+    /// root for private short-lived worker files.
+    /// </summary>
+    public InspectionWorkerClient(
+        WorkerClientOptions options,
+        string operationStorageRoot)
+        : this(
+            options,
+            WorkerInstallationLayout.WorkerExecutableRelativePath,
+            Array.Empty<string>(),
+            CaptureParentEnvironment,
+            operationStorageRoot,
+            new ProtectedWorkerSessionFactory())
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(operationStorageRoot);
     }
 
     /// <summary>
@@ -80,6 +99,7 @@ public sealed class InspectionWorkerClient : IInspectionWorkerClient
             fixedWorkerRelativePath,
             testOnlyArguments,
             parentEnvironmentProvider,
+            operationStorageRoot: null,
             new ProtectedWorkerSessionFactory())
     {
     }
@@ -89,6 +109,7 @@ public sealed class InspectionWorkerClient : IInspectionWorkerClient
         string fixedWorkerRelativePath,
         IReadOnlyList<string> testOnlyArguments,
         Func<IReadOnlyDictionary<string, string?>> parentEnvironmentProvider,
+        string? operationStorageRoot,
         IProtectedWorkerSessionFactory sessionFactory)
     {
         ArgumentNullException.ThrowIfNull(options);
@@ -103,6 +124,7 @@ public sealed class InspectionWorkerClient : IInspectionWorkerClient
         _sessionFactory = sessionFactory;
         _testOnlyArguments = Array.AsReadOnly([.. testOnlyArguments]);
         _parentEnvironmentProvider = parentEnvironmentProvider;
+        _operationStorageRoot = operationStorageRoot;
     }
 
     /// <inheritdoc />
@@ -902,7 +924,7 @@ public sealed class InspectionWorkerClient : IInspectionWorkerClient
         }
     }
 
-    private static IReadOnlyDictionary<string, string?>
+    private static Dictionary<string, string?>
         CaptureParentEnvironment()
     {
         Dictionary<string, string?> values =
@@ -960,7 +982,22 @@ public sealed class InspectionWorkerClient : IInspectionWorkerClient
         try
         {
             return TrustedToolOperationEnvironment.Create(
-                _parentEnvironmentProvider());
+                _parentEnvironmentProvider(),
+                _operationStorageRoot);
+        }
+        catch (TrustedToolOperationEnvironmentSetupException error)
+        {
+            string code = error.Kind switch
+            {
+                TrustedToolOperationEnvironmentFailureKind.Storage =>
+                    WorkerClientFailureCodes.WorkerEnvironmentStorageFailed,
+                TrustedToolOperationEnvironmentFailureKind.AccessControl =>
+                    WorkerClientFailureCodes.WorkerEnvironmentAccessControlFailed,
+                _ => WorkerClientFailureCodes.WorkerEnvironmentPolicyFailed,
+            };
+            throw PolicyFailure(
+                code,
+                "The Model Inspection worker environment could not be prepared.");
         }
         catch (InvalidOperationException)
         {

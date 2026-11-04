@@ -7,6 +7,7 @@ using GraniteEdgeAI.Features.ModelInspection.Runtime;
 using GraniteEdgeAI.Features.ModelInspection.Services;
 using GraniteEdgeAI.ModelInspection.WorkerClient;
 using Windows.ApplicationModel;
+using Windows.Storage;
 
 namespace GraniteEdgeAI.Features.ModelInspection.Infrastructure;
 
@@ -27,15 +28,30 @@ internal static class ModelInspectionWorkerComposition
         "The unpackaged Model Inspection worker root is unavailable.";
     private const string PackageIdentityUnavailableMessage =
         "The Model Inspection package identity could not be determined.";
+    private const string PackageLocalStorageUnavailableMessage =
+        "The Model Inspection package local storage is unavailable.";
     private const int ErrorSuccess = 0;
     private const int ErrorInsufficientBuffer = 122;
     private const int AppModelErrorNoPackage = 15_700;
 
     internal static IInspectionWorkerClient CreateDefaultClient()
     {
-        string approvedRoot = ResolveApprovedApplicationRoot();
-        IInspectionWorkerClient processClient = new InspectionWorkerClient(
-            WorkerClientOptions.CreateDefault(approvedRoot));
+        bool packageIdentityAvailable = HasPackageIdentity();
+        string approvedRoot = packageIdentityAvailable
+            ? ResolveApprovedApplicationRoot(
+                packageIdentityAvailable: true,
+                Package.Current.InstalledLocation.Path,
+                AppContext.BaseDirectory)
+            : ResolveApprovedApplicationRoot(
+                packageIdentityAvailable: false,
+                installedPackageRoot: null,
+                AppContext.BaseDirectory);
+        WorkerClientOptions options = WorkerClientOptions.CreateDefault(approvedRoot);
+        IInspectionWorkerClient processClient = packageIdentityAvailable
+            ? new InspectionWorkerClient(
+                options,
+                ResolvePackageLocalStorageRoot(ApplicationData.Current.LocalFolder.Path))
+            : new InspectionWorkerClient(options);
         return new ManifestVerifyingInspectionWorkerClient(
             approvedRoot,
             LoadTrustedWorkerManifest(),
@@ -128,6 +144,9 @@ internal static class ModelInspectionWorkerComposition
 
         return canonicalRoot;
     }
+
+    internal static string ResolvePackageLocalStorageRoot(string? candidate) =>
+        RequireExistingAbsoluteRoot(candidate, PackageLocalStorageUnavailableMessage);
 
     private static bool HasPackageIdentity()
     {

@@ -19,6 +19,17 @@ namespace GraniteEdgeAI.UnitTests;
 public sealed class ModelInspectionWorkerCompositionTests
 {
     [TestMethod]
+    public void ResolvePackageLocalStorageRoot_UsesExistingAbsoluteDirectory()
+    {
+        using TemporaryDirectory localState = new();
+
+        string actual = ModelInspectionWorkerComposition
+            .ResolvePackageLocalStorageRoot(localState.Path);
+
+        Assert.AreEqual(Path.GetFullPath(localState.Path), actual);
+    }
+
+    [TestMethod]
     public void ResolveApprovedApplicationRoot_PackageIdentityWins()
     {
         using TemporaryDirectory installedRoot = new();

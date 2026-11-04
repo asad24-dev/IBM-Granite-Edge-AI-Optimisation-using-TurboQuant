@@ -19,6 +19,10 @@ public static class WorkerClientFailureCodes
     public const string WorkerHandlePolicyFailed = "worker_handle_policy_failed";
     public const string WorkerEnvironmentPolicyFailed =
         "worker_environment_policy_failed";
+    public const string WorkerEnvironmentStorageFailed =
+        "worker_environment_storage_failed";
+    public const string WorkerEnvironmentAccessControlFailed =
+        "worker_environment_access_control_failed";
     public const string WorkerHandshakeTimeout = "worker_handshake_timeout";
     public const string WorkerHandshakeInvalid = "worker_handshake_invalid";
     public const string WorkerProtocolInvalid = "worker_protocol_invalid";
@@ -42,6 +46,8 @@ public static class WorkerClientFailureCodes
             WorkerContainmentFailed,
             WorkerHandlePolicyFailed,
             WorkerEnvironmentPolicyFailed,
+            WorkerEnvironmentStorageFailed,
+            WorkerEnvironmentAccessControlFailed,
             WorkerHandshakeTimeout,
             WorkerHandshakeInvalid,
             WorkerProtocolInvalid,

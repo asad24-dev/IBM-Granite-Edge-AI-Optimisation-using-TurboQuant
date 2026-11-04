@@ -94,6 +94,8 @@ public sealed class WorkerClientDomainTests
             WorkerClientFailureCodes.WorkerContainmentFailed,
             WorkerClientFailureCodes.WorkerHandlePolicyFailed,
             WorkerClientFailureCodes.WorkerEnvironmentPolicyFailed,
+            WorkerClientFailureCodes.WorkerEnvironmentStorageFailed,
+            WorkerClientFailureCodes.WorkerEnvironmentAccessControlFailed,
             WorkerClientFailureCodes.WorkerHandshakeTimeout,
             WorkerClientFailureCodes.WorkerHandshakeInvalid,
             WorkerClientFailureCodes.WorkerProtocolInvalid,
