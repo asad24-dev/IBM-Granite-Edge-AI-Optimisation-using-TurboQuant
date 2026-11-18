@@ -18,6 +18,9 @@ This is an executable hash, **not an installer checksum**. All three E6 inspecti
 
 Use the [package handover record](Package-Handover.md) for package identity and remaining build details. The 1.0.5.0 record links source, package, signature and local update/chat validation; clean-install testing remains outstanding.
 
+For the engineering repair behind version 1.0.5.0 and its target-laptop
+validation, see [the packaged-app repair and validation record](Repair-Validation-1.0.5.0.md).
+
 | Item | Status / next step |
 | --- | --- |
 | Guides | Available in [manuals](../docs/manuals/README.md). |
