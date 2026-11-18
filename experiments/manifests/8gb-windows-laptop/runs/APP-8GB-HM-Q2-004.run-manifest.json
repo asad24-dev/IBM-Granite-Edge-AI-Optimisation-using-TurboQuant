@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "8GB-WINDOWS-LAPTOP-v1",
+  "test_id": "APP-8GB-HM-Q2-004",
+  "run_id": "APP-8GB-HM-Q2-004",
+  "route": "packaged-app-post-release-compatibility-check",
+  "run_purpose": "Check whether the repaired 1.0.5.0 packaged app can inspect the verified Q2_K model and reach a hardware compatibility result after the required LLM Fit evidence is provisioned.",
+  "status": "completed-blocked",
+  "operator": "Muhammad Asad Majeed",
+  "references": {
+    "environment_id": "ENV-8GB-LENOVO-82QC-001",
+    "prior_run_ids": [
+      "APP-8GB-HM-Q2-001",
+      "APP-8GB-HM-Q2-002",
+      "APP-8GB-HM-Q2-003"
+    ],
+    "setup_id": "SETUP-8GB-LLMFIT-001",
+    "application_package_name": "GraniteEdgeAI.Asad.Development",
+    "application_setup_package_version": "1.0.5.0",
+    "model_id": "granite-4.0-h-micro-q2-k"
+  },
+  "model": {
+    "filename": "granite-4.0-h-micro-Q2_K.gguf",
+    "weight_quantisation": "Q2_K",
+    "size_bytes": 1226247840,
+    "sha256": "e60b313fc0ce2a0a2c3903f4399ac61fe1048c38f219bcbd9f7a708e168b8ead",
+    "selection_route": "Use a local model; existing verified local GGUF; no new download"
+  },
+  "test_controls": {
+    "download_new_model": false,
+    "change_model_or_quantisation": false,
+    "llmfit_version": "1.1.9",
+    "llmfit_executable_sha256": "db82bcb17f065b7ff7528ffe9904b2b0e1cce0c843fcd659b4ee1432a2e72e19"
+  },
+  "result": {
+    "outcome": "compatibility-rejected-insufficient-safe-ram",
+    "model_inspection_completed": true,
+    "hardware_inspection_completed": true,
+    "hardware_support_code": "HI-REPORT-CREATED",
+    "runtime_route_reported": "llama.cpp CPU",
+    "context_tokens": 4096,
+    "cache": "Not reported",
+    "estimated_peak_memory_gib": 2.7,
+    "available_memory_gib": 1.2,
+    "safe_memory_mib": 669,
+    "reached_configuration": false,
+    "reached_chat": false,
+    "message": "Not enough free RAM. No smaller setup has been verified for this model."
+  },
+  "evidence": {
+    "preflight": "experiments/raw-results/8gb-windows-laptop/APP-8GB-HM-Q2-004/preflight-before-llmfit-provisioning.txt",
+    "screenshot": "experiments/raw-results/8gb-windows-laptop/APP-8GB-HM-Q2-004/screenshots/Insufficient_RAM.png"
+  },
+  "notes": "This check followed LLM Fit provisioning but did not use a clean minimal-workload state. APP-8GB-HM-Q2-005 is the authoritative fresh-restart baseline."
+}

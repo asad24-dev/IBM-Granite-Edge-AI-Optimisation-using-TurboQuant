@@ -175,6 +175,47 @@ identify the operational failure cause.
 | Interpretation | The exact H Micro Q2_K model can load, create a small CPU context, and generate text on the Lenovo under this exact bounded source-runtime configuration. This is the first local inference evidence, but it does not unblock or validate the packaged application. |
 | Next safe action | Repeat after a clean baseline with a modestly larger output cap, record peak memory and timing per stage, then test a short second turn before changing context/model/quantisation variables. |
 
+### SETUP-8GB-LLMFIT-001 — pinned LLM Fit provisioning
+
+| Field | Record |
+| --- | --- |
+| Date | 2026-11-18 Europe/London |
+| Purpose | Make the optional LLM Fit evidence route available to the installed packaged app without weakening its hardware-compatibility policy. |
+| Candidate | LLM Fit `1.1.9`; `llmfit.exe` SHA-256 `db82bcb17f065b7ff7528ffe9904b2b0e1cce0c843fcd659b4ee1432a2e72e19`. |
+| Acquisition | The repository's existing acquisition script downloaded and verified the pinned candidate without executing it. |
+| Provisioned inventory | An administrator placed only `llmfit.exe`, `LICENSE`, and `README.md` in the machine-wide folder expected by the app. |
+| Result | The subsequent app hardware report listed LLM Fit among its information sources. |
+| Interpretation | This is a local test dependency setup result, not a Granite model or inference result. The binary and machine-wide copy are not repository artifacts. |
+
+### APP-8GB-HM-Q2-004 — post-release packaged compatibility check
+
+| Field | Record |
+| --- | --- |
+| Date | 2026-11-18 Europe/London |
+| App package | Granite `1.0.5.0` (`GraniteEdgeAI.Asad.Development`). |
+| Model | Existing verified Granite 4.0 H Micro `Q2_K` GGUF; 1,226,247,840 bytes; SHA-256 `e60b313fc0ce2a0a2c3903f4399ac61fe1048c38f219bcbd9f7a708e168b8ead`. |
+| Workflow reached | Model inspection and hardware inspection completed. The hardware report used LLM Fit, Windows, DXGI, neural-processor and llama.cpp evidence. |
+| Compatibility result | Rejected before configuration: 2.7 GiB estimated peak memory, 669 MiB safe memory, 4K context. |
+| Model loaded / chat | No / no. |
+| Interpretation | This validates that the repaired packaged app can move past the former inspection blocker. It was performed during setup activity, so its memory values are not the clean baseline. |
+
+### APP-8GB-HM-Q2-005 — fresh-restart minimal-workload compatibility baseline
+
+| Field | Record |
+| --- | --- |
+| Date/time | 2026-11-18 12:21:52 UTC |
+| Windows last boot | 2026-11-18 12:19:55 local time |
+| App package | Granite `1.0.5.0` (`GraniteEdgeAI.Asad.Development_1.0.5.0_x64__mzyd3a5swg3k4`). |
+| Test control | Fresh Windows restart. The preflight's largest-process list contains Windows components, Windows Terminal and PowerShell, but not Chrome, Visual Studio Code, Teams or SkillsBuild. |
+| Preflight free physical RAM / C: free storage | 3,620,900 KiB / 20,912,185,344 bytes. |
+| Model | Existing verified Granite 4.0 H Micro `Q2_K` GGUF; SHA-256 `e60b313fc0ce2a0a2c3903f4399ac61fe1048c38f219bcbd9f7a708e168b8ead`. |
+| Offered route | llama.cpp; 4K context; cache not reported. |
+| App memory assessment | 2.9 GiB available now, 512 MiB safety reserve, 2.4 GiB safe memory, 2.7 GiB estimated peak memory, 334 MB shortfall. |
+| Result | **Blocked before configuration and chat:** `Not enough free RAM`. |
+| Evidence | `experiments/raw-results/8gb-windows-laptop/APP-8GB-HM-Q2-005/`. |
+| Interpretation | The current packaged Q2_K profile at its offered 4K context does not meet the app's safety threshold even under the recorded clean-start condition. This is not an inference, response-quality, or stability result. |
+| Next safe action | Investigate a bounded lower-context profile before trying another model, quantisation, or workload. |
+
 Before starting this run, reboot if practical and record date/time, available RAM,
 free storage, app version/build, exact model hash and file size, selected
 backend/cache/context, load result, time to first response where available,
