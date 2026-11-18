@@ -19,7 +19,14 @@ inconclusive attempts.
 | `APP-8GB-HM-Q2-001` | H Micro Q2_K inspection attempt; failed before hardware fit |
 | `APP-8GB-HM-Q2-002` | Local-file inspection retry; reproduced the same generic inspection failure |
 | `APP-8GB-HM-Q2-003` | Short-path hard-link inspection test; reproduced the same generic inspection failure |
+| `SETUP-8GB-LLMFIT-001` | Provisioning of the exact pinned LLM Fit 1.1.9 package required by the packaged app's compatibility route |
+| `APP-8GB-HM-Q2-004` | Post-release compatibility check; inspection and hardware assessment completed, but the active setup had insufficient safe RAM |
+| `APP-8GB-HM-Q2-005` | Fresh-restart minimal-workload compatibility baseline; the default Q2_K 4K profile remained 334 MB below the safe-memory threshold |
 
 `APP-8GB-HM-Q2-001` reached model inspection after the in-app download flow but
 failed before hardware fit, configuration, model load, or chat. The failure is
 preserved as evidence and must not be overwritten by a retry.
+
+The later v1.0.5.0 records are separate from those historical inspection
+failures. They show that model inspection and hardware assessment now complete
+in the packaged app. They do not establish a working chat configuration.

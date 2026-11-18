@@ -2,8 +2,8 @@
 
 **Investigation ID:** `INV-8GB-INSPECT-001`  
 **Date:** 20–26 October 2026  
-**Status:** Packaged-app inspection blocker narrowed; exact packaged worker-client failure remains hidden  
-**Related runs:** `APP-8GB-HM-Q2-001`, `APP-8GB-HM-Q2-002`
+**Status:** Historical 1.0.4.0 packaged-app blocker; resolved and validated by the 1.0.5.0 follow-up
+**Related runs:** `APP-8GB-HM-Q2-001` to `APP-8GB-HM-Q2-005`
 
 ## Observed behaviour
 
@@ -211,3 +211,22 @@ the installed app's package context, so it does not establish app success. The
 remaining failure boundary is now specifically the installed app's composition
 or package-context worker launch/environment, including the possibility of a
 client/version difference between source and supplied package.
+
+## Resolution validation — 18 November 2026
+
+The fork's signed research package `1.0.5.0` was installed on the target
+laptop after its bundle hashes, certificate and Microsoft dependency signatures
+passed the setup check. The same verified local Q2_K GGUF then completed
+**Model inspection** in the packaged application and reached **Hardware
+inspection**.
+
+This closes the practical investigation target for `INSPECT-OP-001`: the
+replacement package no longer reproduces the old model-inspection blocker on
+this device. It does not turn the earlier `1.0.4.0` results into successes, and
+it does not establish a working 8 GB chat configuration.
+
+The follow-up compatibility checks instead produced an evidence-led memory
+result. With the app's offered 4K Q2_K profile, the clean-restart baseline was
+334 MB below the application's safe-memory threshold. That is a separate
+configuration-fit question, recorded in `APP-8GB-HM-Q2-004` and
+`APP-8GB-HM-Q2-005`.

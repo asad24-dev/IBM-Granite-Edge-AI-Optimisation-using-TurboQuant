@@ -1,0 +1,63 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "8GB-WINDOWS-LAPTOP-v1",
+  "test_id": "APP-8GB-HM-Q2-005",
+  "run_id": "APP-8GB-HM-Q2-005",
+  "route": "packaged-app-clean-boot-compatibility-baseline",
+  "run_purpose": "Measure whether the current packaged Q2_K route can pass hardware compatibility after a fresh Windows restart with no browser, development tool, or collaboration application intentionally opened.",
+  "status": "completed-blocked",
+  "operator": "Muhammad Asad Majeed",
+  "references": {
+    "environment_id": "ENV-8GB-LENOVO-82QC-001",
+    "prior_run_id": "APP-8GB-HM-Q2-004",
+    "setup_id": "SETUP-8GB-LLMFIT-001",
+    "application_package_name": "GraniteEdgeAI.Asad.Development",
+    "application_setup_package_version": "1.0.5.0",
+    "application_package_full_name": "GraniteEdgeAI.Asad.Development_1.0.5.0_x64__mzyd3a5swg3k4",
+    "model_id": "granite-4.0-h-micro-q2-k"
+  },
+  "preflight": {
+    "captured_at_utc": "2026-11-18T12:21:52.8520329Z",
+    "windows_last_boot_local": "2026-11-18T12:19:55",
+    "free_physical_memory_kib": 3620900,
+    "total_physical_memory_bytes": 8301043712,
+    "system_drive_free_bytes": 20912185344,
+    "minimal_workload_note": "The captured largest-process list contains Windows components, Windows Terminal, and PowerShell. It does not contain Chrome, Visual Studio Code, Teams, or SkillsBuild."
+  },
+  "model": {
+    "filename": "granite-4.0-h-micro-Q2_K.gguf",
+    "weight_quantisation": "Q2_K",
+    "size_bytes": 1226247840,
+    "sha256": "e60b313fc0ce2a0a2c3903f4399ac61fe1048c38f219bcbd9f7a708e168b8ead",
+    "selection_route": "Use a local model; existing verified local GGUF; no new download"
+  },
+  "test_controls": {
+    "fresh_windows_restart": true,
+    "download_new_model": false,
+    "change_model_or_quantisation": false,
+    "change_context_or_cache": false,
+    "llmfit_version": "1.1.9",
+    "llmfit_executable_sha256": "db82bcb17f065b7ff7528ffe9904b2b0e1cce0c843fcd659b4ee1432a2e72e19"
+  },
+  "result": {
+    "outcome": "compatibility-rejected-insufficient-safe-ram",
+    "model_inspection_completed": true,
+    "hardware_inspection_completed": true,
+    "context_tokens": 4096,
+    "runtime_route_reported": "llama.cpp",
+    "cache": "Not reported",
+    "estimated_peak_memory_gib": 2.7,
+    "available_memory_gib": 2.9,
+    "safety_reserve_mib": 512,
+    "safe_memory_gib": 2.4,
+    "shortfall_mib": 334,
+    "reached_configuration": false,
+    "reached_chat": false,
+    "message": "Not enough free RAM. No smaller setup has been verified for this model."
+  },
+  "evidence": {
+    "preflight": "experiments/raw-results/8gb-windows-laptop/APP-8GB-HM-Q2-005/preflight.txt",
+    "screenshot": "experiments/raw-results/8gb-windows-laptop/APP-8GB-HM-Q2-005/screenshots/01-compatibility-insufficient-safe-ram.png"
+  },
+  "interpretation": "The default packaged Q2_K route at the offered 4K context did not pass the app's safety threshold on a fresh, minimal-workload boot. This is not a model-load, inference, response-quality, or stability result."
+}
