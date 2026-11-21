@@ -16,7 +16,7 @@ For a released-package installation, download [release `v1.0.5.0`](https://githu
 
 This is a self-signed research/test package for Windows 11 x64. Follow the verification steps in the guide and do not bypass Windows or organisational security controls. The package is not a claim that every model workflow will fit on every computer.
 
-The 1.0.5.0 guide invokes an unsigned setup script directly, which may be blocked by PowerShell execution policy. The guide is being corrected; follow your device's security policy and do not assume that the package includes every optional hardware tool.
+Use the linked repository guide for the clarified PowerShell instructions; the copy inside the original release ZIP predates them. The package does not include every optional hardware tool.
 
 ## 8 GB campaign
 
