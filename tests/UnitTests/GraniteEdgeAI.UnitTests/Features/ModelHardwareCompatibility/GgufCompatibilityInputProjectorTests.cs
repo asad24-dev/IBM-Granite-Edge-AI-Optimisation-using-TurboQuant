@@ -200,6 +200,34 @@ public sealed class GgufCompatibilityInputProjectorTests
     }
 
     [TestMethod]
+    public void ExperimentalQ2Context_IsIdenticalInAssessmentAndLaunchAndStillBlocksLowMemory()
+    {
+        ModelDownloadCatalogEntry entry = PinnedGraniteModelCatalog.ForPreferenceBand(
+            OptimizationPreferenceBand.MaximumEfficiency);
+        ModelInspectionExecutionResult terminal = PinnedDownloadTerminal(entry, kvHeadCount: 8, fileType: 10);
+        Assert.IsTrue(GgufCompatibilityInputProjector.TryPrepare(
+            ModelHandoff(terminal), terminal, HardwareRunId, HardwareHandoff(),
+            out PreparedGgufCompatibilityInput? prepared));
+        Assert.IsTrue(GgufOptimizationProductionAuthority.TryCreate(prepared!, out var authority));
+
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        CompatibilityEvaluation ample = authority!.Evaluate(
+            CompatibilityFreshResourcesInput.Create(
+                CurrentlyAvailableMemory.FromBytes(21UL * 1024 * 1024 * 1024),
+                0, 500_000_000_000UL, now), new HashSet<string>(), now, CancellationToken.None);
+        Assert.AreEqual(CompatibilityScreenState.EstimatedCompatible, ample.Screen.State);
+        Assert.AreEqual(2_048, ample.Screen.CurrentSetup!.ContextTokens);
+        Assert.AreEqual(2_048, CurrentPayload(authority).Gguf!.ContextSize);
+
+        CompatibilityEvaluation insufficient = authority.Evaluate(
+            CompatibilityFreshResourcesInput.Create(
+                CurrentlyAvailableMemory.FromBytes(512UL * 1024 * 1024),
+                0, 500_000_000_000UL, now), new HashSet<string>(), now, CancellationToken.None);
+        Assert.AreNotEqual(CompatibilityScreenState.EstimatedCompatible, insufficient.Screen.State);
+        Assert.IsFalse(insufficient.Screen.UseCurrentModelAvailable);
+    }
+
+    [TestMethod]
     public void ExactPinnedQ4_MissingKvHeadsReachesEstimableCompatibility()
     {
         ModelDownloadCatalogEntry entry = PinnedGraniteModelCatalog.ForPreferenceBand(

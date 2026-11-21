@@ -1,0 +1,76 @@
+﻿Timestamp: 2026-11-21T18:21:35.4146675+00:00
+
+=== App packages ===
+
+
+Name            : GraniteEdgeAI.Asad.Development
+Version         : 1.0.5.0
+PackageFullName : GraniteEdgeAI.Asad.Development_1.0.5.0_x64__mzyd3a5swg3k4
+
+Name            : GraniteEdgeAI.Asad.Context2048Experiment
+Version         : 1.0.5.1
+PackageFullName : GraniteEdgeAI.Asad.Context2048Experiment_1.0.5.1_x64__mzyd3a5swg3k4
+
+
+
+
+
+=== Operating system ===
+
+
+Caption            : Microsoft Windows 11 Home
+Version            : 10.0.22631
+BuildNumber        : 22631
+LastBootUpTime     : 2026-11-21 6:19:07 PM
+FreePhysicalMemory : 3697740
+
+
+
+
+
+=== Memory and processor ===
+
+
+TotalPhysicalMemory : 8301043712
+
+
+
+
+
+
+Name                      : 12th Gen Intel(R) Core(TM) i3-1215U
+NumberOfCores             : 6
+NumberOfLogicalProcessors : 8
+
+
+
+
+
+=== C drive ===
+
+
+Name : C
+Used : 111084212224
+Free : 14563500032
+
+
+
+
+
+=== Ten largest running processes ===
+
+ProcessName                Id WorkingSetMiB
+-----------                -- -------------
+MsMpEng                  5192         390.5
+SearchHost              11036         234.9
+explorer                 9352         218.6
+TextInputHost           13848           198
+MicrosoftSecurityApp    15836         190.2
+dwm                      2156           155
+StartMenuExperienceHost 11044         137.8
+WindowsTerminal         13876         103.8
+powershell              16560          99.7
+OneDrive.Sync.Service   14944          81.9
+
+
+

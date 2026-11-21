@@ -451,6 +451,8 @@ public sealed class PrivacyCanaryTests
         // The fact digest functions hash length-prefixed numeric/enumerated
         // facts and never return or retain source values, paths, or names
         "CompatibilityEngine.FreshResourcePolicyVersion",
+        // Fixed public model digest; contains no paths or user data.
+        "CompatibilityEngine.ExperimentalModelSha256",
         "CompatibilityFactDigest.ComputeHardware",
         "CompatibilityFactDigest.ComputeModel",
         "CompatibilityFactDigest.Digest",

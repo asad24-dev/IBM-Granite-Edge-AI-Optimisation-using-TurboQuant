@@ -22,6 +22,23 @@
 
 ## Weekly updates
 
+### Week of 16–22 November 2026 — exploratory Q3_K_M observation
+
+**Completed**
+
+- Recorded `APP-8GB-HM-Q3-001`, an unplanned packaged-app observation using Granite 4.0 H Micro `Q3_K_M` at the displayed 4,096-token context on the Lenovo 8 GB laptop.
+- The displayed compatibility assessment passed and one two-turn llama.cpp chat session completed. Raw screenshots and a postflight process/memory snapshot are retained with the run record.
+
+**Result / interpretation**
+
+- This observation used 3.5 GB displayed available-to-model memory against a 3.0 GB estimate. The earlier Q2_K 4K baseline had 2.4 GB safe memory against a 2.7 GiB estimate and was blocked.
+- The live-memory conditions differ, so this is not a controlled Q2-versus-Q3 comparison, does not disprove the earlier Q2_K block, and does not establish stability or performance. The postflight `llama-server` working set is not a peak-memory measurement.
+
+**Next actions**
+
+1. Plan a controlled Q2/Q3 × 2K/4K matrix with fresh preflight before each run, fixed prompts, the same CPU/F16-cache route, and repeated sessions.
+2. Capture load duration, response timing, and memory measurements before making a student-facing recommendation.
+
 ### Week of 20–26 October 2026 — setup and first controlled experiment
 
 **Completed**

@@ -162,7 +162,8 @@ internal sealed class GgufOptimizationProductionAuthority
                 return false;
             }
             int maximumContext = Math.Min(declaredContext, 32768);
-            int evaluatedContext = Math.Min(4096, declaredContext);
+            int evaluatedContext = Math.Min(
+                CompatibilityEngine.GgufContextCeilingForModel(prepared.ModelSha256), declaredContext);
             GgufRouteConfiguration currentConfiguration = current.GgufConfiguration!;
             if (saved is not null)
             {

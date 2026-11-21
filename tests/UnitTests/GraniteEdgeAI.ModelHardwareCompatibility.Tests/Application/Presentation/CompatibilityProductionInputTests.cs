@@ -17,6 +17,16 @@ public sealed class CompatibilityProductionInputTests
     private const ulong GiB = 1024UL * 1024 * 1024;
 
     [TestMethod]
+    public void ExperimentalContext_IsLimitedToTheExactQ2Model()
+    {
+        const string q2Hash = "e60b313fc0ce2a0a2c3903f4399ac61fe1048c38f219bcbd9f7a708e168b8ead";
+        Assert.AreEqual(2048, CompatibilityEngine.GgufContextCeilingForModel(q2Hash));
+        Assert.AreEqual(2048, CompatibilityEngine.GgufContextCeilingForModel(q2Hash.ToUpperInvariant()));
+        Assert.AreEqual(4096, CompatibilityEngine.GgufContextCeilingForModel(new string('a', 64)));
+        Assert.AreEqual(4096, CompatibilityEngine.GgufContextCeilingForModel(null));
+    }
+
+    [TestMethod]
     public void ValidProductionInput_ReachesARealDecision()
     {
         CompatibilityScreenModel result = CompatibilityEngine.Run(ValidInput());
@@ -529,12 +539,28 @@ public sealed class CompatibilityProductionInputTests
         Assert.IsNull(evaluation.PlanningSession);
     }
 
+    [TestMethod]
+    public void ExperimentalQ2_Uses2kAndStillRefusesInsufficientMemory()
+    {
+        const string q2Hash = "e60b313fc0ce2a0a2c3903f4399ac61fe1048c38f219bcbd9f7a708e168b8ead";
+        CompatibilityEvaluation enough = CompatibilityEngine.EvaluateProduction(
+            ActualParameterlessGgufInput(10 * GiB, modelSha256: q2Hash, broadContextAdmission: true));
+        Assert.AreEqual(CompatibilityScreenState.EstimatedCompatible, enough.Screen.State);
+        Assert.AreEqual(2048, enough.Screen.CurrentSetup!.ContextTokens);
+
+        CompatibilityEvaluation insufficient = CompatibilityEngine.EvaluateProduction(
+            ActualParameterlessGgufInput(1 * GiB, modelSha256: q2Hash, broadContextAdmission: true));
+        Assert.AreEqual(CompatibilityScreenState.NoEstimatedSafeConfiguration, insufficient.Screen.State);
+        Assert.IsFalse(insufficient.Screen.UseCurrentModelAvailable);
+    }
+
     private static CompatibilityProductionInput ActualParameterlessGgufInput(
         ulong availableSystemMemoryBytes,
         string? modelSha256 = null,
         string? runtimeSourceCommit = null,
         int declaredContextLimit = 131_072,
-        GgufKvCacheFormat baselineCache = GgufKvCacheFormat.F16)
+        GgufKvCacheFormat baselineCache = GgufKvCacheFormat.F16,
+        bool broadContextAdmission = false)
     {
         modelSha256 ??=
             "662b0626cd58f443baea23559b469df6576a81d349649c59413b36a9fb32eb29";
@@ -576,8 +602,8 @@ public sealed class CompatibilityProductionInputTests
             GgufWeightFormat.Imported,
             GgufKvCacheFormat.F16,
             GpuOffloadLevel.None,
-            4_096,
-            4_096,
+            broadContextAdmission ? 512 : 4_096,
+            broadContextAdmission ? 8_192 : 4_096,
             SupportLevel.DeclaredSupported,
             requiresEvidence: false);
         OptimizationCapabilitySnapshot snapshot =

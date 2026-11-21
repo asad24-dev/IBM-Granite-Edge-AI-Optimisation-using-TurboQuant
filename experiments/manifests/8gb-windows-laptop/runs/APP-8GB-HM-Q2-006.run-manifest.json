@@ -1,0 +1,119 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "8GB-WINDOWS-LAPTOP-v1",
+  "test_id": "APP-8GB-HM-Q2-006",
+  "run_id": "APP-8GB-HM-Q2-006",
+  "status": "completed-observed-single-session",
+  "route": "packaged-app-experimental-2k-context",
+  "run_purpose": "Assess the exact Q2_K model at 2048 tokens on the Lenovo while preserving the existing memory gate.",
+  "references": {
+    "environment_id": "ENV-8GB-LENOVO-82QC-001",
+    "comparison_run_id": "APP-8GB-HM-Q2-005",
+    "source_base_commit": "347235f7946af1037cfbf5ff2a777138a5bf479e",
+    "application_package_name": "GraniteEdgeAI.Asad.Context2048Experiment",
+    "application_package_version": "1.0.5.1",
+    "application_package_sha256": "1BE1668875A9B5344E062AE4C731F137133FC31D179F234F36B3A65678193174"
+  },
+  "model": {
+    "filename": "granite-4.0-h-micro-Q2_K.gguf",
+    "weight_quantisation": "Q2_K",
+    "size_bytes": 1226247840,
+    "sha256": "e60b313fc0ce2a0a2c3903f4399ac61fe1048c38f219bcbd9f7a708e168b8ead"
+  },
+  "test_controls": {
+    "context_tokens": 2048,
+    "runtime_route_intended": "llama.cpp CPU",
+    "cache": "record actual; baseline reported not available",
+    "fresh_windows_restart": true,
+    "llmfit_version": "1.1.9",
+    "safety_policy_changed": false,
+    "prompt": "Explain what a computer processor does in two short sentences",
+    "second_turn_prompt": "What is one difference between a processor and memory?"
+  },
+  "result": {
+    "observed_at": "2026-11-21",
+    "preflight_captured_at": "2026-11-21T18:21:35.4146675+00:00",
+    "package_verification": {
+      "sha256": "1BE1668875A9B5344E062AE4C731F137133FC31D179F234F36B3A65678193174",
+      "authenticode_signature": "Valid",
+      "signer": "CN=Granite Edge AI Development",
+      "certificate_thumbprint": "D6B842420C0F0FBC36758CAC7F22B52D39CAD911",
+      "package_identity": "GraniteEdgeAI.Asad.Context2048Experiment",
+      "version": "1.0.5.1",
+      "architecture": "x64"
+    },
+    "environment_observed": {
+      "operating_system": "Microsoft Windows 11 Home, Version 10.0.22631, Build 22631",
+      "processor": "12th Gen Intel Core i3-1215U",
+      "physical_cores": 6,
+      "logical_processors": 8,
+      "total_physical_memory_bytes": 8301043712,
+      "free_physical_memory_kib_preflight": 3697740,
+      "c_drive_free_bytes_preflight": 14563500032
+    },
+    "model_identity": {
+      "source": "existing local Granite 4.0 H Micro Q2_K GGUF",
+      "sha256_reverified_for_this_run": false,
+      "note": "The hash is carried forward from the prior verified record; no new model-hash observation was supplied for this run."
+    },
+    "inspections": {
+      "model_inspection": "completed",
+      "hardware_inspection": "completed"
+    },
+    "compatibility_screen": {
+      "decision": "Yes — this model should run",
+      "context_tokens_displayed": 2048,
+      "free_ram_displayed_gb": 3.5,
+      "ram_available_to_model_displayed_gb": 3.0,
+      "estimated_current_setup_peak_ram_displayed_gb": 2.5,
+      "safety_reserve_displayed_mb": 512,
+      "model_format_displayed": "Q2_K",
+      "runtime_route_displayed": "llama.cpp",
+      "warnings": "none observed on the supplied configuration screen",
+      "measurement_qualification": "Displayed estimates and rounded values; not measured peak inference memory."
+    },
+    "chat_observation": {
+      "reached_local_chat": true,
+      "runtime_header": "llama.cpp · CPU",
+      "cache_selection_displayed": "F16 cache (selected)",
+      "conversation_turns": [
+        {
+          "prompt": "Explain what a computer processor does in two short sentences",
+          "response": "A computer processor, also known as an \"processor\" or \"CPU\" (Central Processing Unit), is the main component in a computer that performs most of a computer's main tasks. It does this by executing instructions stored in computer memory."
+        },
+        {
+          "prompt": "What is one difference between a processor and memory?",
+          "response": "A processor is the part of the computer that executes instructions and performs calculations, while memory is the part of the computer that stores data and instructions temporarily or permanently."
+        }
+      ],
+      "session_count": 1,
+      "response_time_measurement": null,
+      "peak_inference_memory_measurement": null
+    },
+    "outcome": "One observed two-turn packaged-app chat session completed on the target laptop. This is not repeated-stability, measured-performance, or complete response-quality evidence."
+  },
+  "evidence": {
+    "raw_evidence_folder": "experiments/raw-results/8gb-windows-laptop/APP-8GB-HM-Q2-006/",
+    "preflight": {
+      "path": "preflight.txt",
+      "sha256": "65E87ED3D7C8D79261F1D1CB3E6171BCD3A61FF107C455C0FF100E55A8D56DEA"
+    },
+    "screenshots": [
+      {
+        "path": "screenshots/01-compatibility-2k-fit.png",
+        "sha256": "379AA95CB98BF67A59BE2797800A437D4D9AC08DC47A9F6360679705343E6BB9"
+      },
+      {
+        "path": "screenshots/02-two-turn-chat.png",
+        "sha256": "A2C337DAC18F27A69977B61903800C52918EBE93B51F5A199BA7A5C82D84AE2F"
+      }
+    ]
+  },
+  "comparison": {
+    "against_run_id": "APP-8GB-HM-Q2-005",
+    "prior_4k_result": "Blocked at the memory-fit check with 2.7 GiB estimated peak memory and 2.4 GiB safe memory.",
+    "current_2k_result": "Passed the displayed fit check at 2.5 GB estimated peak memory and 3 GB RAM available to the model, then reached a two-turn local chat.",
+    "causal_limit": "Context was changed from 4096 to 2048, but available safe memory also differed between runs. This comparison does not establish that context reduction alone caused the pass."
+  },
+  "notes": "Source review links the model-specific 2048 context bound to both compatibility estimation and runtime admission/composition. The screenshots independently prove only the displayed setup value, not the runtime context value. No timings, generation rate, or peak inference-memory measurements were supplied."
+}

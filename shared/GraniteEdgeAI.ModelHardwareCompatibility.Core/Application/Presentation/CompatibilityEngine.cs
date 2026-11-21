@@ -26,6 +26,17 @@ namespace GraniteEdgeAI.ModelHardwareCompatibility.Core.Application.Presentation
 /// </summary>
 public static class CompatibilityEngine
 {
+    // Local 8 GB research build: keep estimation and the GGUF launch payload
+    // bound to the same smaller context. This is not a validated recommendation.
+    public const int ExperimentalGgufContextCeilingTokens = 2048;
+    private const string ExperimentalModelSha256 =
+        "e60b313fc0ce2a0a2c3903f4399ac61fe1048c38f219bcbd9f7a708e168b8ead";
+
+    public static int GgufContextCeilingForModel(string? modelSha256) =>
+        string.Equals(modelSha256, ExperimentalModelSha256, StringComparison.OrdinalIgnoreCase)
+            ? ExperimentalGgufContextCeilingTokens
+            : 4096;
+
     // Matches the approved Hardware Inspection dynamic-memory evidence policy.
     internal static readonly TimeSpan FreshResourceMaximumAge =
         OptimizationFreshnessPolicy.MaximumAge;
@@ -135,11 +146,15 @@ public static class CompatibilityEngine
                 continueEnabled: false));
         }
 
+        int ggufCeiling = GgufContextCeilingForModel(input.JourneyAuthority?.ModelSha256);
+        int ggufContext = Math.Min(ggufCeiling,
+            input.CurrentModel.Gguf?.DeclaredContextLimit ?? ggufCeiling);
         CompatibilityRunResult result = input.CurrentModel.Route ==
             OptimizationRoute.Gguf
                 ? CompatibilityRunCoordinator.Execute(
                     new CompatibilityRunRequest(
-                        CompatibilityContextRequest.ApplicationDefault()),
+                        CompatibilityContextRequest.UserRequested(
+                            ContextTokenCount.FromTokens(ggufContext))),
                     ProductionDependencies(input, timeProvider),
                     cancellationToken)
                 : EvaluateOpenVinoBaseline(
@@ -229,7 +244,8 @@ public static class CompatibilityEngine
     {
         int? declaredContext = input.CurrentModel.Gguf?.DeclaredContextLimit
             ?? input.CurrentModel.OpenVino?.DeclaredContextLimit;
-        int baselineTokens = Math.Min(4096, declaredContext ?? 4096);
+        int ceiling = GgufContextCeilingForModel(input.JourneyAuthority?.ModelSha256);
+        int baselineTokens = Math.Min(ceiling, declaredContext ?? ceiling);
         return CompatibilityRunDependencies.Create(
             new ProductionGateway(input),
             new ProductionModelFactsSource(input),
