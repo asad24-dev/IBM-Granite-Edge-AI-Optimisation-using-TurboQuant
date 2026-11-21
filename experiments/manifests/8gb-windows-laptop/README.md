@@ -4,6 +4,9 @@ This folder contains the new physical-device campaign for the Lenovo 82QC with
 8 GB installed RAM. It is separate from the frozen route campaigns and does
 not reuse their test or run identifiers.
 
+The campaign's scope, identifiers, evidence rules and decision gates are in
+the [8 GB Windows Laptop Campaign Definition](../../../docs/planning/8GB-Windows-Laptop-Campaign-Definition-v1.md).
+
 The human-readable running record is
 [`docs/testing/8GB-Laptop-Test-Log.md`](../../../docs/testing/8GB-Laptop-Test-Log.md).
 Structured manifests record the environment and each observed execution. Raw
