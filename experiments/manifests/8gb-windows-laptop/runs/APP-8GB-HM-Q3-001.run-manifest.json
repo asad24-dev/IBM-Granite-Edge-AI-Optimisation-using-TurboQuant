@@ -1,0 +1,103 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "8GB-WINDOWS-LAPTOP-v1",
+  "test_id": "APP-8GB-HM-Q3-001",
+  "run_id": "APP-8GB-HM-Q3-001",
+  "status": "completed-exploratory-observation",
+  "route": "packaged-app-existing-experimental-build",
+  "title": "Exploratory packaged-app Q3_K_M 4K chat observation",
+  "run_purpose": "Record an unplanned but valid Q3_K_M observation after APP-8GB-HM-Q2-006; it is not a controlled repeat or a Q2-versus-Q3 comparison.",
+  "references": {
+    "environment_id": "ENV-8GB-LENOVO-82QC-001",
+    "comparison_run_id": "APP-8GB-HM-Q2-005",
+    "existing_package_evidence_run_id": "APP-8GB-HM-Q2-006",
+    "application_package_observed_postflight": "GraniteEdgeAI.Asad.Context2048Experiment_1.0.5.1_x64__mzyd3a5swg3k4",
+    "package_evidence_note": "The postflight inventory confirms the existing experimental package was installed. It does not constitute a new package verification, code change, build, or release."
+  },
+  "model": {
+    "filename": "granite-4.0-h-micro-Q3_K_M.gguf",
+    "weight_quantisation": "Q3_K_M",
+    "base_model": "Granite 4.0 H Micro (same 3B base model as Q2_K)",
+    "size_bytes": 1555472032,
+    "sha256": "BB684177D546A2C6D3AEC9CC591FC8FA75D9C16A27E798CBB2400FE52D9B7E29",
+    "local_storage_path_observed": "C:\\Users\\Asad\\AppData\\Local\\Packages\\GraniteEdgeAI.Asad.Context2048Experiment_mzyd3a5swg3k4\\LocalState\\GraniteEdgeAI\\Models\\Models\\granite-4.0-h-micro-Q3_K_M.gguf"
+  },
+  "test_controls": {
+    "context_tokens_displayed": 4096,
+    "runtime_route_displayed": "llama.cpp CPU",
+    "cache_selection_displayed": "F16 cache (selected)",
+    "fixed_prompts": [
+      "Explain what a computer processor does in two short sentences.",
+      "What is one difference between a processor and memory?"
+    ],
+    "controlled_repeat": false
+  },
+  "result": {
+    "observed_at": "2026-11-21",
+    "inspections": {
+      "model_inspection": "completed as shown by the supplied compatibility screen",
+      "hardware_fit": "passed as shown by the supplied compatibility screen"
+    },
+    "compatibility_screen": {
+      "decision": "Yes — this model should run",
+      "selected_model_displayed": "Q3_K_M",
+      "context_tokens_displayed": 4096,
+      "free_ram_displayed_gb": 4.0,
+      "ram_available_to_model_displayed_gb": 3.5,
+      "estimated_current_setup_peak_ram_displayed_gb": 3.0,
+      "measurement_qualification": "Displayed estimates and rounded values; not a measured inference peak."
+    },
+    "chat_observation": {
+      "reached_local_chat": true,
+      "runtime_header": "llama.cpp",
+      "cache_selection_displayed": "F16 cache (selected)",
+      "conversation_turns": [
+        {
+          "prompt": "Explain what a computer processor does in two short sentences.",
+          "response": "A computer processor, or CPU, executes instructions from software programs to perform tasks, and manages data flow within the computer system."
+        },
+        {
+          "prompt": "What is one difference between a processor and memory?",
+          "response": "A processor, or CPU, is responsible for executing instructions and processing data, while memory (RAM) is used to temporarily store data that the processor needs for immediate access."
+        }
+      ],
+      "response_time_measurement": null,
+      "generation_rate_measurement": null,
+      "load_duration_measurement": null,
+      "peak_inference_memory_measurement": null
+    },
+    "postflight": {
+      "captured_at": "2026-11-21T18:49:24.9749042+00:00",
+      "windows_last_boot": "2026-11-21 18:19:07 local",
+      "llama_server_working_set_mib": 2079.5,
+      "free_physical_memory_kib": 1936504,
+      "c_drive_free_bytes": 12989845504,
+      "qualification": "Captured after the chat had completed. It is postflight evidence, not a clean-start baseline and not a peak-memory measurement."
+    },
+    "outcome": "One exploratory two-turn packaged-app chat observation completed successfully."
+  },
+  "comparison": {
+    "earlier_q2_4k_run_id": "APP-8GB-HM-Q2-005",
+    "earlier_q2_4k_result": "Blocked with 2.4 GB safe memory against a 2.7 GiB estimated peak, a 334 MB shortfall.",
+    "this_q3_4k_observation": "Passed the displayed fit check with 3.5 GB available to the model against a 3.0 GB estimate, then completed two chat turns.",
+    "interpretation": "Q3_K_M is a higher-precision quantisation of the same 3B H Micro base model, not a larger-parameter model. This run does not disprove the earlier Q2_K 4K block. The materially different live available-memory conditions mean it is not a controlled Q2-versus-Q3 comparison."
+  },
+  "next_experiment_recommendation": "Do not download another model yet. Plan a controlled Q2/Q3 × 2K/4K matrix with a fresh preflight before every run, fixed prompts, the same CPU/F16-cache route, and repeat sessions.",
+  "evidence": {
+    "raw_evidence_folder": "experiments/raw-results/8gb-windows-laptop/APP-8GB-HM-Q3-001/",
+    "postflight": {
+      "path": "postflight-after-q3-4k-chat.txt",
+      "sha256": "87AB9613FA94C706E7E40D074E8ED9EA80FD8B5265397452DD8DF79DDB7B6F97"
+    },
+    "screenshots": [
+      {
+        "path": "screenshots/01-q3-4k-compatibility.png",
+        "sha256": "F57D3A4F771A870236FEBCAB6721472FC41EE9E38B03893A28249D7502B071F4"
+      },
+      {
+        "path": "screenshots/02-q3-two-turn-chat.png",
+        "sha256": "9148CBEAB5B770BE0C311042E93633C390785B9F0CF0F224232D956E1BDE138F"
+      }
+    ]
+  }
+}

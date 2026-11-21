@@ -25,11 +25,15 @@ inconclusive attempts.
 | `SETUP-8GB-LLMFIT-001` | Provisioning of the exact pinned LLM Fit 1.1.9 package required by the packaged app's compatibility route |
 | `APP-8GB-HM-Q2-004` | Post-release compatibility check; inspection and hardware assessment completed, but the active setup had insufficient safe RAM |
 | `APP-8GB-HM-Q2-005` | Fresh-restart minimal-workload compatibility baseline; the default Q2_K 4K profile remained 334 MB below the safe-memory threshold |
+| `APP-8GB-HM-Q2-006` | First 2K-context experimental packaged-app run; one observed two-turn chat session completed, without timing, peak-memory, or repeated-stability measurements |
+| `APP-8GB-HM-Q3-001` | Exploratory Q3_K_M 4K packaged-app observation; one two-turn chat session completed under different live-memory conditions, not a controlled Q2-versus-Q3 comparison |
 
 `APP-8GB-HM-Q2-001` reached model inspection after the in-app download flow but
 failed before hardware fit, configuration, model load, or chat. The failure is
 preserved as evidence and must not be overwritten by a retry.
 
-The later v1.0.5.0 records are separate from those historical inspection
+The later v1.0.5.x records are separate from those historical inspection
 failures. They show that model inspection and hardware assessment now complete
-in the packaged app. They do not establish a working chat configuration.
+in the packaged app. `APP-8GB-HM-Q2-006` additionally records one observed
+two-turn chat session using the experimental 2K profile. It is not evidence of
+repeated stability, measured performance, or general 8 GB support.

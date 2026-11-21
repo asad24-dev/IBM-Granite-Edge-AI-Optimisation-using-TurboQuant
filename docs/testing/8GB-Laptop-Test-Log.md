@@ -216,6 +216,44 @@ identify the operational failure cause.
 | Interpretation | The current packaged Q2_K profile at its offered 4K context does not meet the app's safety threshold even under the recorded clean-start condition. This is not an inference, response-quality, or stability result. |
 | Next safe action | Investigate a bounded lower-context profile before trying another model, quantisation, or workload. |
 
+### APP-8GB-HM-Q2-006 — first 2K-context packaged-app chat observation
+
+| Field | Record |
+| --- | --- |
+| Date / preflight timestamp | 2026-11-21 / `2026-11-21T18:21:35.4146675+00:00` |
+| App package | `GraniteEdgeAI.Asad.Context2048Experiment` `1.0.5.1`, x64; SHA-256 `1BE1668875A9B5344E062AE4C731F137133FC31D179F234F36B3A65678193174`. Operator-reported Authenticode result: Valid; signer `CN=Granite Edge AI Development`; certificate thumbprint `D6B842420C0F0FBC36758CAC7F22B52D39CAD911`. |
+| Device / preflight | Windows 11 Home `10.0.22631` build `22631`; 12th Gen Intel Core i3-1215U; 6 physical cores / 8 logical processors; 8,301,043,712 bytes physical memory. Preflight free physical memory: 3,697,740 KiB; C: free: 14,563,500,032 bytes. |
+| Model | Existing local Granite 4.0 H Micro `Q2_K` GGUF. The model hash is carried forward from the previous verified record; it was not rechecked in this run. |
+| Inspections | Model inspection and hardware inspection completed, as reported by the run operator. |
+| Displayed setup | Q2_K; llama.cpp; 2,048-token context; 3.5 GB free RAM now; 3 GB RAM available to the model; 2.5 GB estimated current-setup peak RAM; 512 MB safety reserve; no warning observed on the supplied configuration screen. These are displayed estimates/rounded values, not measured peak inference memory. |
+| Chat route and cache | Chat screen displayed `llama.cpp · CPU` and `F16 cache (selected)`. |
+| Turn 1 | Prompt: `Explain what a computer processor does in two short sentences`<br>Response: `A computer processor, also known as an "processor" or "CPU" (Central Processing Unit), is the main component in a computer that performs most of a computer's main tasks. It does this by executing instructions stored in computer memory.` |
+| Turn 2 | Prompt: `What is one difference between a processor and memory?`<br>Response: `A processor is the part of the computer that executes instructions and performs calculations, while memory is the part of the computer that stores data and instructions temporarily or permanently.` |
+| Measurements not captured | No formal response-time, generation-rate, or peak-inference-memory measurement was supplied. |
+| Result | **One observed two-turn packaged-app chat session completed.** |
+| Comparison with APP-8GB-HM-Q2-005 | The 4K baseline was blocked at 2.7 GiB estimated peak against 2.4 GiB safe memory. This run passed the displayed fit check at 2.5 GB estimated peak and 3 GB RAM available to the model. Context changed, but available safe memory also differed; this does **not** establish that context reduction alone caused the pass. |
+| Evidence | `experiments/raw-results/8gb-windows-laptop/APP-8GB-HM-Q2-006/`; structured manifest; and `docs/testing/8GB-Laptop-Q2-2K-Code-Evidence.md`. |
+| Interpretation / next safe action | This is an observed success for one session, not repeated stability, measured performance, or a complete response-quality evaluation. Repeat separately recorded sessions and capture timing and memory before making a student recommendation. |
+
+### APP-8GB-HM-Q3-001 — exploratory packaged-app Q3_K_M 4K chat observation
+
+| Field | Record |
+| --- | --- |
+| Date / scope | 2026-11-21. Unplanned exploratory observation after APP-8GB-HM-Q2-006; not a controlled repeat or Q2-versus-Q3 comparison. |
+| Device | Lenovo 82QC; Windows 11 Home `10.0.22631` build `22631`; Intel Core i3-1215U; 8 GB RAM. |
+| App package | Postflight package inventory lists the existing `GraniteEdgeAI.Asad.Context2048Experiment` `1.0.5.1` package. Package verification is linked to APP-8GB-HM-Q2-006; no new package verification, code change, build, or release is claimed. |
+| Model | Granite 4.0 H Micro `Q3_K_M` GGUF; 1,555,472,032 bytes; SHA-256 `BB684177D546A2C6D3AEC9CC591FC8FA75D9C16A27E798CBB2400FE52D9B7E29`. Q3_K_M is a higher-precision quantisation of the same 3B H Micro base model as Q2_K, not a larger-parameter model. |
+| Displayed compatibility result | Q3_K_M; llama.cpp; 4,096-token context; 4 GB free RAM now; 3.5 GB available to the model; 3 GB estimated current-setup peak RAM; **Yes — this model should run**. These are displayed estimates/rounded values, not measured inference memory. |
+| Chat route and cache | Chat screen displayed llama.cpp and `F16 cache (selected)`. |
+| Turn 1 | Prompt: `Explain what a computer processor does in two short sentences.`<br>Response: `A computer processor, or CPU, executes instructions from software programs to perform tasks, and manages data flow within the computer system.` |
+| Turn 2 | Prompt: `What is one difference between a processor and memory?`<br>Response: `A processor, or CPU, is responsible for executing instructions and processing data, while memory (RAM) is used to temporarily store data that the processor needs for immediate access.` |
+| Postflight snapshot | Captured after chat at `2026-11-21T18:49:24.9749042+00:00`: `llama-server` working set 2,079.5 MiB; free physical memory 1,936,504 KiB; C: free storage 12,989,845,504 bytes. This is not a clean-start baseline or a peak-memory measurement. |
+| Measurements not captured | No formal response-time, generation-rate, model-load-duration, or peak-inference-memory measurement was captured. |
+| Result | **One exploratory two-turn packaged-app chat observation completed successfully.** |
+| Comparison limit | APP-8GB-HM-Q2-005 was blocked at 2.4 GB safe memory against a 2.7 GiB estimate. This run displayed 3.5 GB available to the model against a 3.0 GB estimate. The live available-memory conditions differed materially, so this does not disprove the Q2 4K block or establish a quantisation comparison. |
+| Evidence | `experiments/raw-results/8gb-windows-laptop/APP-8GB-HM-Q3-001/` and `experiments/manifests/8gb-windows-laptop/runs/APP-8GB-HM-Q3-001.run-manifest.json`. |
+| Next safe action | Do not download another model yet. Plan a controlled Q2/Q3 × 2K/4K matrix with fresh preflight before each run, fixed prompts, the same CPU/F16-cache route, and repeat sessions. |
+
 Before starting this run, reboot if practical and record date/time, available RAM,
 free storage, app version/build, exact model hash and file size, selected
 backend/cache/context, load result, time to first response where available,
